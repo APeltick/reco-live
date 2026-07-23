@@ -1,0 +1,41 @@
+{
+  // Strict, shared compiler policy for every TypeScript project.
+  "compilerOptions": {
+    // Enables TypeScript's complete strict type-checking family.
+    "strict": true,
+    // Adds undefined when indexing may not find an item.
+    "noUncheckedIndexedAccess": true,
+    // Distinguishes an omitted optional property from one explicitly set to undefined.
+    "exactOptionalPropertyTypes": true,
+    // Requires the override keyword for inherited class members.
+    "noImplicitOverride": true,
+    // Requires every function code path to return a value when appropriate.
+    "noImplicitReturns": true,
+    // Prevents accidental fallthrough between switch cases.
+    "noFallthroughCasesInSwitch": true,
+    // Requires bracket access for values declared through an index signature.
+    "noPropertyAccessFromIndexSignature": true,
+    // Reports unresolved side-effect-only imports.
+    "noUncheckedSideEffectImports": true,
+    // Reports unused local declarations.
+    "noUnusedLocals": true,
+    // Reports unused function parameters.
+    "noUnusedParameters": true,
+    // Prevents imports that differ from file names only by letter case.
+    "forceConsistentCasingInFileNames": true,
+    // Preserves import and export syntax exactly as written.
+    "verbatimModuleSyntax": true,
+    // Requires every file to be safe for isolated transpilation.
+    "isolatedModules": true,
+    // Treats every non-declaration file as a module.
+    "moduleDetection": "force",
+    // Restricts TypeScript syntax to constructs erasable by a runtime transpiler.
+    "erasableSyntaxOnly": true,
+    // Uses JavaScript class-field semantics for emitted code.
+    "useDefineForClassFields": true,
+    // Skips type-checking declaration files for faster, less noisy builds.
+    "skipLibCheck": true,
+    // TypeScript validates the project but never writes JavaScript output.
+    "noEmit": true
+  }
+}

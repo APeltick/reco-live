@@ -1,0 +1,9 @@
+/** Types the application environment variables exposed by Vite. */
+
+interface ImportMetaEnv {
+  readonly VITE_APP_API_URL?: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}

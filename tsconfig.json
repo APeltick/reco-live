@@ -1,0 +1,11 @@
+{
+  // Root solution config: source files are defined by the referenced projects.
+  "files": [],
+  // Builds the browser application and Node.js tooling as separate TypeScript projects.
+  "references": [
+    // Browser application project.
+    { "path": "./tsconfig.app.json" },
+    // Vite and other Node.js tooling project.
+    { "path": "./tsconfig.node.json" }
+  ]
+}

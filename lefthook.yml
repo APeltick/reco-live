@@ -1,0 +1,18 @@
+min_version: 2.1.10
+
+pre-commit:
+  jobs:
+    - name: Lint code
+      run: npm run lint
+
+pre-push:
+  parallel: true
+  jobs:
+    - name: Verify lockfile installation
+      run: npm ci --dry-run --ignore-scripts --legacy-peer-deps
+
+    - name: Run production quality gate
+      run: npm run check
+
+    - name: Audit production dependencies
+      run: npm run audit

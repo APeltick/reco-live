@@ -1,0 +1,31 @@
+{
+  // Reuses the shared strict compiler policy.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    // Stores incremental-build metadata outside source control.
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    // Targets modern JavaScript supported by the project browser matrix.
+    "target": "ES2023",
+    // Provides modern JavaScript and browser DOM type declarations.
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    // Keeps native ES modules for Vite to process.
+    "module": "ESNext",
+    // Resolves imports with bundler semantics rather than Node.js extension rules.
+    "moduleResolution": "Bundler",
+    // Uses React's automatic JSX runtime.
+    "jsx": "react-jsx",
+    // Includes Vite's client-side environment types.
+    "types": ["vite/client"],
+    // Permits imports whose source extension TypeScript does not natively model.
+    "allowArbitraryExtensions": true,
+    "paths": {
+      // Aliases
+      "~app/*": ["./src/app/*"],
+      "~pages/*": ["./src/pages/*"],
+      "~features/*": ["./src/features/*"],
+      "~shared/*": ["./src/shared/*"]
+    },
+  },
+  // Type-checks the browser application source only.
+  "include": ["src"]
+}
