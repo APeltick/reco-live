@@ -34,7 +34,7 @@ The hook does not fix files or stage changes automatically. Correct the issue, r
 
 - runs `npm ci --dry-run --ignore-scripts --legacy-peer-deps` to ensure `package-lock.json` reproduces the dependency tree while the documented accessibility peer-dependency issue remains open;
 - runs `npm run check` for TypeScript, ESLint, Stylelint, and a Vite production build;
-- runs `npm audit --audit-level=high` for high and critical dependency vulnerabilities. This check requires access to the npm registry.
+- runs `npm audit --omit=dev --audit-level=high` for high and critical vulnerabilities in production dependencies only. Dev dependencies are not checked by the hook; check them with plain `npm audit` and see the known issues in [`docs/issues/README.md`](../issues/README.md). This check requires access to the npm registry.
 
 There are currently no automated tests in the project. Add them to `npm run check` and this hook will enforce them before every push.
 

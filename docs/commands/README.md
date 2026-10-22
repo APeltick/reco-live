@@ -11,7 +11,7 @@
 | `npm run lint` | Runs ESLint followed by Stylelint. |
 | `npm run build` | Type-checks the project and creates a Vite production build in `dist/`. |
 | `npm run preview` | Serves the existing production build locally. |
-| `npm run audit` | Reports dependency vulnerabilities with severity `high` or `critical`. |
+| `npm run audit` | Reports production dependency vulnerabilities with severity `high` or `critical` (`npm audit --omit=dev --audit-level=high`). Dev dependencies are not included; use plain `npm audit` for them and see [known issues](../issues/README.md). |
 | `npm run check` | Runs type checking, both linters, and the production build. This is the local quality gate. |
 
 ## Recommended workflow
