@@ -4,9 +4,8 @@ import { AppErrorBoundary } from "~app/error-handling";
 import { MainLayout } from "~app/layouts/main-layout";
 import { HomePage } from "~pages/home";
 import { ProductPageLazy } from "~pages/product";
+import { ROUTES_CONSTANTS } from "~shared/config/routes";
 import { ContainerLoader } from "~shared/ui/container-loader";
-
-import { ROUTES_CONSTANTS } from "./routes.constants";
 
 export const router = createBrowserRouter([
   {
