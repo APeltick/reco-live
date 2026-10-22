@@ -142,7 +142,7 @@
 | find_free | gh issue list --state open --search 'no:assignee' |
 | claim | gh issue edit <N> --add-assignee @me (только если assignees пусто) |
 | set_status | метки status:* |
-| link_pr | Closes #<N> в описании PR |
+| link_pr | Refs #<N> в описании PR (не Closes: issue закрывает только человек) |
 | update_breakdown | чеклист в конце issue |
 | close_subtask | отметить пункт чеклиста |
 | comment | gh issue comment <N> |
