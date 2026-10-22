@@ -1,0 +1,88 @@
+# managed by AI kit
+# ai-kit-version: 0.3.0-dev
+# AI kit: проверки PR (spec/05 §1, §8). Собран `ai-team ci render` из project overlay — правка через overlay и повторный render.
+# Блоки «ai-kit:keep» сохраняются при повторном render — туда пишутся services и env проекта.
+# Draft PR — проверки пропускаются. Обязательные проверки для защиты ветки: pr-result и ai-review.
+# Описание PR читается через API, а не из события: поправили поля PR — достаточно «Re-run failed jobs» (событие edited
+# не используется: на правке заголовка пропущенные jobs отчитались бы зелёными поверх красных).
+# Шаги «setup: …» — настройка CI: упало там — «сломан CI», а не виноват PR (DEC-0071); остальные шаги — проверки PR.
+# Push в integration branch — те же проверки на её голове (без process guard и e2e PR): шаг проверки красный и там — «CI сломан»,
+# а не «виноват PR» у каждого PR (ai-team ci why, watch).
+name: pr-checks
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [main]
+  push:
+    branches: [main]
+concurrency:
+  group: pr-checks-${{ github.event.pull_request.number || github.event.merge_group.head_ref || github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+  pull-requests: read
+jobs:
+  checks:
+    if: github.event_name == 'merge_group' || github.event_name == 'push' || github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # ai-kit:keep checks-services
+    # ai-kit:keep-end
+    # ai-kit:keep checks-env
+    # ai-kit:keep-end
+    steps:
+      - name: "setup: checkout"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: "setup: node"
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+      - name: "setup: install"
+        run: |
+          npm ci --legacy-peer-deps
+      - name: process guard
+        # Process guard сверяет PR (описание, зоны, правила команды) — у push в integration branch PR нет.
+        if: github.event_name != 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          GUARD_BASE: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha }}
+        run: |
+          # На merge group описания PR нет — поля PR template и Tasks: там не проверяются.
+          if [ -n "$PR" ]; then
+            body="$(gh pr view "$PR" -R "$GITHUB_REPOSITORY" --json body --jq .body)" || { echo "не прочитал описание PR #$PR"; exit 1; }
+            export PR_BODY="$body"
+          fi
+          node .github/ai-team/process-guard.mjs --base "$GUARD_BASE"
+      - name: typecheck
+        run: |
+          npm run typecheck
+      - name: lint
+        run: |
+          npm run lint
+      - name: "setup: openspec"
+        # OpenSpec CLI на машине CI нет: ставится, только когда в PR есть openspec/ (change).
+        if: hashFiles('openspec/**') != ''
+        run: |
+          command -v openspec >/dev/null || npm install -g @fission-ai/openspec@1 --no-fund --no-audit
+      - name: openspec validate
+        if: hashFiles('openspec/**') != ''
+        run: |
+          openspec validate --all --strict
+      - name: build
+        run: |
+          npm run build
+  pr-result:
+    # Одна обязательная проверка вместо многих: пропущенное (draft, другое событие) — не красное.
+    if: always()
+    needs: [checks]
+    runs-on: ubuntu-latest
+    steps:
+      - name: итог
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          for r in $RESULTS; do case "$r" in success|skipped) ;; *) echo "красное: $RESULTS"; exit 1 ;; esac; done
+          echo "ok: $RESULTS"
