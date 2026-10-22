@@ -88,7 +88,7 @@ npm run audit
 
 ### Subject
 
-The development-only lint tooling pulls in `braces@3.0.3`, which is affected by a high-severity stack-exhaustion denial of service through deeply nested brace patterns. Impact is limited to running `npm run lint:styles` on the developer machine or CI; the production bundle does not contain `braces`.
+Development-only lint tooling on developer machines and CI pulls in `braces@3.0.3`, which is affected by a high-severity stack-exhaustion denial of service (GHSA-vfj7-8cjw-p6xm) through deeply nested brace patterns, and the production bundle does not contain it.
 
 ### Description
 
@@ -141,8 +141,15 @@ Limitations and actions that must not be taken:
 
 The workaround becomes obsolete when a `braces` release outside the advisory range is published, or when `stylelint` (or `micromatch`) is released with a `braces` dependency that is fixed. Then:
 
+`stylelint` is pinned to an exact version in `package.json` (as all devDependencies are), so `npm update` does not bump it. Pick the command that matches the fix:
+
 ```sh
-npm update braces micromatch stylelint
+# A fixed stylelint release that brings a fixed braces (install the exact version, as the project pins devDependencies):
+npm install stylelint@<fixed-version> --save-dev --save-exact --legacy-peer-deps
+
+# Only braces/micromatch are fixed and stylelint stays at 17.14.0 (refresh the lockfile):
+npm update braces micromatch --legacy-peer-deps
+
 npm ls braces                              # expected: fixed braces version, no vulnerable copy
 npm audit                                  # expected: braces no longer listed
 npm run lint:styles
