@@ -126,7 +126,7 @@ npm run audit                                     # expected: exit code 0 (produ
 
 Limitations and actions that must not be taken:
 
-- Do not run `npm audit fix --force`: the suggested change replaces lint plugins with other major versions and removes the project's lint setup.
+- Do not run `npm audit fix --force`: it moves the lint plugins to other major versions, often older ones, which breaks the current ESLint configuration and does not install `minimatch` 11 (`minimatch` itself has no fix available in the audit output).
 - Do not add `overrides` that force `minimatch` to 11 (team decision OI-413: this entry is documentation only). The lint plugins declare ranges that exclude 11.x, so forcing it breaks their dependency contract.
 - Do not pick a lint plugin version from the `npm audit` output. Choose versions only after checking their declared `minimatch` range and release notes.
 - Do not add an ignore tool (`audit-ci`, `better-npm-audit` or similar) only to silence this advisory.
@@ -136,7 +136,7 @@ Limitations and actions that must not be taken:
 
 - [GitHub Advisory GHSA-g3hv-75wg-m249 (minimatch, denial of service via globparts amplification)](https://github.com/advisories/GHSA-g3hv-75wg-m249)
 - [Upstream security advisory in the minimatch repository](https://github.com/isaacs/minimatch/security/advisories/GHSA-g3hv-75wg-m249)
-- [minimatch v11.0.1 release (first fixed version)](https://github.com/isaacs/minimatch/releases/tag/v11.0.1)
+- [minimatch v11.0.1 tag (first fixed version)](https://github.com/isaacs/minimatch/releases/tag/v11.0.1)
 - Optional: [APeltick/reco-live issue #5 (project tracking for the dependency audit)](https://github.com/APeltick/reco-live/issues/5)
 
 ### Removal plan
