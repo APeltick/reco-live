@@ -151,7 +151,7 @@ const isAdrDoc = (f) => isDecisionFile(f, [PROJECT_ADR, ATD_DIR, LEGACY_ATD_DIR]
 // Логика решений — в decisions.mjs рядом; нет его (process guard обновили без него) — правило adr красное, остальное идёт.
 let D = null;
 try { D = await import("./decisions.mjs"); } catch { /* скажет правило adr */ }
-const NO_DECISIONS = ".github/ai-team/decisions.mjs нет рядом с process guard — решения не проверить: ai-team update (или скопируйте utils/decisions.mjs AI kit)";
+const NO_DECISIONS = ".github/ai-team/decisions.mjs нет рядом с process guard — решения не проверить: обновите AI kit (`node <AI kit>/installer/apply.mjs update`) или скопируйте utils/decisions.mjs AI kit";
 // Читать папку: рабочая копия или дерево ref (голова PR, merge-base).
 const readerOf = (dir, ref = HEAD) => (ref === "HEAD" ? D.fsReader(join(ROOT, dir)) : D.gitReader(join(ROOT, dir), ref));
 const INDEX_CMD = "ai-team adr-index (или node .github/ai-team/process-guard.mjs adr-index --write)";
