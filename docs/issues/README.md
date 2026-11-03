@@ -126,7 +126,7 @@ npm run audit                                     # expected: exit code 0 (produ
 
 Limitations and actions that must not be taken:
 
-- Do not run `npm audit fix --force`: it moves the lint plugins to other major versions, often older ones, which breaks the current ESLint configuration and does not install `minimatch` 11 (`minimatch` itself has no fix available in the audit output).
+- Do not run `npm audit fix --force`: it moves the lint plugins to other major versions, often older ones, which breaks the current ESLint configuration; `npm audit` offers only semver-major, breaking fixes.
 - Do not add `overrides` that force `minimatch` to 11 (team decision OI-413: this entry is documentation only). The lint plugins declare ranges that exclude 11.x, so forcing it breaks their dependency contract.
 - Do not pick a lint plugin version from the `npm audit` output. Choose versions only after checking their declared `minimatch` range and release notes.
 - Do not add an ignore tool (`audit-ci`, `better-npm-audit` or similar) only to silence this advisory.
