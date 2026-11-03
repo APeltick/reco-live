@@ -84,76 +84,72 @@ npm run check
 npm run audit
 ```
 
-## `braces` GHSA-vfj7-8cjw-p6xm — dev-only stack exhaustion via `stylelint`
+## `minimatch` GHSA-g3hv-75wg-m249 — dev-only denial of service via globparts amplification
 
 ### Subject
 
-Development-only lint tooling on developer machines and CI pulls in `braces@3.0.3`, which is affected by a high-severity stack-exhaustion denial of service (GHSA-vfj7-8cjw-p6xm) through deeply nested brace patterns, and the production bundle does not contain it.
+Development-only lint tooling pulls in `minimatch` versions below 11.0.1, which are affected by a moderate denial-of-service advisory (GHSA-g3hv-75wg-m249); the production bundle, its runtime dependencies, and the production audit gate (`npm run audit`) are not affected.
 
 ### Description
 
-`braces` is vulnerable to stack exhaustion (denial of service) when it expands deeply nested brace patterns. Advisory: [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm), severity high.
+`minimatch` before 11.0.1 is vulnerable to denial of service through globparts amplification, where a crafted glob pattern makes matching do disproportionate work. Advisory: [GHSA-g3hv-75wg-m249](https://github.com/advisories/GHSA-g3hv-75wg-m249), severity moderate. The first fixed release is `minimatch@11.0.1`.
 
-The vulnerable package is reached only through the lint toolchain:
+The fixed release cannot be adopted directly because the lint toolchain does not allow it. The lockfile contains two copies, as shown by `npm ls minimatch --package-lock-only`:
 
 ```text
-stylelint@17.14.0
-└─┬ micromatch@4.0.8
-  └─┬ braces@3.0.3
+minimatch@10.2.5
+├── eslint-plugin-import-x@4.17.1          (declares ^9.0.3 || ^10.1.2)
+├── @typescript-eslint/typescript-estree   (declares ^10.2.2; used by eslint-plugin-perfectionist, eslint-plugin-react-dom, eslint-plugin-react-x, eslint-plugin-sonarjs, typescript-eslint and others)
+└── @eslint/config-array@0.23.5            (declares ^10.2.4; used by eslint)
+minimatch@3.1.5
+└── eslint-plugin-jsx-a11y@6.10.2          (declares ^3.1.2)
 ```
 
-The chain continues through `fast-glob` and `globby`, both dependencies of `stylelint` (a direct dev dependency). The config packages `stylelint-config-recommended` and `stylelint-config-standard` only peer-depend on `stylelint` and are not in the `braces` path; they are listed here as the lint setup that the fix must keep working. `braces` is a `devDependencies`-only path: `npm ls braces --omit=dev` returns empty, and `npm audit --omit=dev` reports 0 vulnerabilities.
+Because the declared ranges of these consumers exclude `11.x`, `npm audit --package-lock-only` reports no non-breaking fix. It lists `minimatch <11.0.1` as moderate, and the lint plugins that depend on the vulnerable copies (for example `eslint-plugin-jsx-a11y`, `eslint-plugin-import-x`, `@typescript-eslint/typescript-estree`) are reported through it.
 
-The exploit needs a deeply nested glob or brace pattern. In this project such patterns come only from the project's own stylelint configuration and file globs (`src/**/*.{css,ts,tsx}`), not from user input or the running application. Exposure is therefore limited to a developer or CI job that runs `npm run lint:styles` (or `npm run lint`) against patterns the project controls.
+The vulnerable copies are reached only through `devDependencies`: `npm ls minimatch --omit=dev --package-lock-only` is empty. The pre-push gate `npm run audit` is production-only (`npm audit --omit=dev --audit-level=high`), so it does not see this advisory and passes while this entry is open. A plain `npm audit` still reports it. The exposure is limited to developer machines and CI jobs that run ESLint against file patterns the project controls, not to user input or the running application.
 
-It cannot be permanently fixed yet because every published `braces` release, including the latest `3.0.3`, is inside the advisory range, so no fixed `braces` version exists for npm overrides to pin. `npm audit` suggests `npm audit fix --force`, which would install `stylelint@7.7.0` (a semver-major downgrade that removes the project's stylelint setup). That is not a fix for this project.
+It cannot be permanently fixed yet because the fix requires the lint plugins to accept `minimatch@11` in their own dependency ranges, which is an upstream change to those packages.
 
-Affected: `braces@3.0.3` (all published versions), via `micromatch@4.0.8`, `fast-glob`, `globby`, `stylelint@17.14.0`, `stylelint-config-recommended` and `stylelint-config-standard@40.0.0`. Affected environment: developer machines and CI jobs that run stylelint. Not affected: the production build and its runtime dependencies. Scope of the audit gate is production only (`npm run audit`, `npm audit --omit=dev --audit-level=high`) because it reflects what users receive; the dev advisory stays visible through a plain `npm audit` and in this entry. Tracking issue in the project: [APeltick/reco-live#5](https://github.com/APeltick/reco-live/issues/5).
+Affected: `minimatch` below 11.0.1 (`10.2.5` and `3.1.5` in this lockfile), through the lint toolchain listed above. Not affected: the production build and its runtime dependencies.
 
 ### Temporary resolution
 
-Keep `stylelint` at the current version and do not force-fix this advisory. Verify the state with:
+Keep the lint toolchain at its current versions and do not force the advisory. Verify the state with:
 
 ```sh
-npm ls braces --omit=dev        # expected: empty (not in production)
-npm ls braces                   # expected: braces@3.0.3 under micromatch under stylelint
-npm audit --omit=dev --audit-level=high   # expected: found 0 vulnerabilities
-npm audit                       # expected: braces listed as high; this is the accepted dev-only finding
+npm ls minimatch --omit=dev --package-lock-only   # expected: empty, exit code 1 (not in production)
+npm ls minimatch --package-lock-only              # expected: minimatch@10.2.5 and minimatch@3.1.5 under the lint plugins
+npm audit --package-lock-only                     # expected: minimatch <11.0.1 listed as moderate
+npm run audit                                     # expected: exit code 0 (production-only gate)
 ```
-
-The project gate `npm run audit` runs the production-only check and therefore passes while this issue is open.
 
 Limitations and actions that must not be taken:
 
-- Do not run `npm audit fix --force`: it downgrades `stylelint` to `7.7.0` and removes the lint setup.
-- Do not add `overrides` for `braces` in `package.json`: no fixed version exists to override to.
+- Do not run `npm audit fix --force`: it moves the lint plugins to other major versions, often older ones, which breaks the current ESLint configuration; `npm audit` offers only semver-major, breaking fixes.
+- Do not add `overrides` that force `minimatch` to 11 (team decision OI-413: this entry is documentation only). The lint plugins declare ranges that exclude 11.x, so forcing it breaks their dependency contract.
+- Do not pick a lint plugin version from the `npm audit` output. Choose versions only after checking their declared `minimatch` range and release notes.
 - Do not add an ignore tool (`audit-ci`, `better-npm-audit` or similar) only to silence this advisory.
-- Do not switch the `audit` script to a full `npm audit` without a decision from the team, because the build would then fail on a dev-only issue with no fix.
-- Do not run lint styles with untrusted glob or pattern input (for example, patterns taken from a pull request description or an external file).
+- Do not switch the `audit` script to a full `npm audit` without a decision from the team, because the pre-push gate would then fail on a dev-only issue with no non-breaking fix.
 
 ### Tracking links
 
-- [GitHub Advisory GHSA-vfj7-8cjw-p6xm (braces, stack exhaustion through deeply nested patterns)](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm)
-- [APeltick/reco-live issue #5 (project tracking for the dependency audit)](https://github.com/APeltick/reco-live/issues/5)
-- Optional: [micromatch/braces repository](https://github.com/micromatch/braces) — check for a new release and its changelog.
+- [GitHub Advisory GHSA-g3hv-75wg-m249 (minimatch, denial of service via globparts amplification)](https://github.com/advisories/GHSA-g3hv-75wg-m249)
+- [Upstream security advisory in the minimatch repository](https://github.com/isaacs/minimatch/security/advisories/GHSA-g3hv-75wg-m249)
+- [minimatch v11.0.1 tag (first fixed version)](https://github.com/isaacs/minimatch/releases/tag/v11.0.1)
+- Optional: [APeltick/reco-live issue #5 (project tracking for the dependency audit)](https://github.com/APeltick/reco-live/issues/5)
 
 ### Removal plan
 
-The workaround becomes obsolete when a `braces` release outside the advisory range is published, or when `stylelint` (or `micromatch`) is released with a `braces` dependency that is fixed. Then:
-
-`stylelint` is pinned to an exact version in `package.json` (as all devDependencies are), so `npm update` does not bump it. Pick the command that matches the fix:
+The workaround becomes obsolete when every installed `minimatch` copy is 11.0.1 or newer. This must happen through updates of the lint plugins themselves, not through `overrides`. Update each lint plugin that depends on an old copy to a version whose declared `minimatch` range excludes 10.x and 3.x (check it with `npm view <plugin>@<version> dependencies.minimatch`), then verify:
 
 ```sh
-# A fixed stylelint release that brings a fixed braces (install the exact version, as the project pins devDependencies):
-npm install stylelint@<fixed-version> --save-dev --save-exact --legacy-peer-deps
-
-# Only braces/micromatch are fixed and stylelint stays at 17.14.0 (refresh the lockfile):
-npm update braces micromatch --legacy-peer-deps
-
-npm ls braces                              # expected: fixed braces version, no vulnerable copy
-npm audit                                  # expected: braces no longer listed
-npm run lint:styles
+npm install <lint-plugin>@<version> --save-dev --save-exact --legacy-peer-deps
+npm ls minimatch --package-lock-only   # expected: only copies at 11.0.1 or newer
+npm audit --package-lock-only          # expected: minimatch no longer listed
+npm ci --legacy-peer-deps
 npm run check
+npm run audit
 ```
 
-If the team decides to audit dev dependencies too, change the `audit` script in `package.json` from `npm audit --omit=dev --audit-level=high` to `npm audit --audit-level=high`, then run `npm run audit`. In either case, remove this entry from `docs/issues/README.md` once `npm audit` no longer reports `braces`.
+If any copy below 11.0.1 remains, keep this entry. Otherwise remove it from `docs/issues/README.md`.
