@@ -238,5 +238,5 @@
 | pr_template | merge | поля AI kit в PR template: `merge` — блоком между метками, `keep` — без полей, `replace` — шаблон AI kit целиком |
 | ci | render | CI AI kit: `render` — `pr-checks.yml` и `full-tests.yml` по project overlay (свои файлы — по метке `# managed by AI kit`), `none` — без CI AI kit |
 | adr | ai-kit | ADR: `ai-kit` — `docs/adr` по spec/13, `keep-own` — свои ADR, правило `adr` process guard выключено |
-| git_hooks | skip | git-хуки проекта на коммитах AI kit installer: `run` — работают, `skip` — пропущены (причина — в AI kit setup report) |
+| git_hooks | run | git-хуки проекта на коммитах AI kit installer: `run` — работают, `skip` — пропущены (причина — в AI kit setup report) |
 | ai:claude-md:CLAUDE.md | keep | оставлено: файл целиком — раздел AI kit, создан setup PR #1 (f28ca9c) 22.10, с тех пор не менялся; обновление меняет только текст между метками |
