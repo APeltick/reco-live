@@ -46,6 +46,8 @@
 | openspec_validate | openspec validate --all --strict | проверка спек |
 | process_guard | node .github/ai-team/process-guard.mjs | process guard AI kit для gate и prefilter (правила — раздел `process-guard`); CI зовёт файл `.github/ai-team/process-guard.mjs` сам, эту строку не читает |
 | screenshot | {playwright} screenshot --full-page --viewport-size=1280,800 {url} {file} | снимок экрана для `ai-team screenshots` (`{playwright}` — node_modules/.bin/playwright проекта, без npx; `{url}`, `{file}` подставляет AI kit) |
+| worktree_prep | — | необязательно: свой шаг для нового worktree (например, создать тестовую базу agent); `ai-team worktree-prep` запускает его в worktree с окружением agent из раздела `env` (spec/09 §1) |
+| ready | — | необязательно: проверка готовности worktree (например `npx tsc --noEmit`); упала — executor subagent не запускает |
 
 ## paths
 
@@ -201,6 +203,7 @@
 | e2e_full_budget_min | — | бюджет времени full e2e lane, мин (spec/05) |
 | e2e_audit_growth_pct | 20 | на сколько % full вырос с прошлого e2e audit — повод спросить operator про новый |
 | heavy_hold_alert_min | 120 | живой держатель heavy lock держит дольше стольких минут — одно сообщение lead «кто и что держит» (spec/09 §2) |
+| brief_files_max | 8 | сколько шаблонов «Файлы» в brief допустимо: больше — `ai-team brief-check` предупреждает «задача слишком широкая» (spec/03 §5) |
 
 ## merge
 
@@ -234,4 +237,5 @@
 | pr_template | merge | поля AI kit в PR template: `merge` — блоком между метками, `keep` — без полей, `replace` — шаблон AI kit целиком |
 | ci | render | CI AI kit: `render` — `pr-checks.yml` и `full-tests.yml` по project overlay (свои файлы — по метке `# managed by AI kit`), `none` — без CI AI kit |
 | adr | ai-kit | ADR: `ai-kit` — `docs/adr` по spec/13, `keep-own` — свои ADR, правило `adr` process guard выключено |
-| git_hooks | run | git-хуки проекта на коммитах AI kit installer: `run` — работают, `skip` — пропущены (причина — в AI kit setup report) |
+| git_hooks | skip | git-хуки проекта на коммитах AI kit installer: `run` — работают, `skip` — пропущены (причина — в AI kit setup report) |
+| ai:claude-md:CLAUDE.md | keep | оставлено: файл целиком — раздел AI kit, создан setup PR #1 (f28ca9c) 22.10, с тех пор не менялся; обновление меняет только текст между метками |

@@ -15,6 +15,7 @@
 - **Процессы**: свои server — `ai-team server start|stop`; `pkill`/`killall` запрещены.
 
 ### При compact сохранить
+<!-- rare: нужен только при compact контекста -->
 
 id agent и роль; текущий task batch и brief; task в работе и их статус; ветку, worktree, PR и PR dossier; изменённые файлы; блокеры и открытые вопросы; последнюю команду проверки и её итог; решения в этой сессии.
 <!-- ai-kit:end -->
