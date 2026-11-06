@@ -28,6 +28,6 @@ dist-ssr
 .env*
 !.env.example
 
-# ai-kit:begin — сборки и отчёты AI kit внутри репозитория (spec/01 §9)
+# ai-kit:begin — AI kit builds and reports inside the repository (spec/01 §9)
 *.noindex/
 # ai-kit:end

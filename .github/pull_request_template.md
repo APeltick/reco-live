@@ -1,29 +1,29 @@
-<!-- ai-kit:begin — поля AI kit (spec/04 §5); обновление AI kit меняет только текст между метками -->
-## Что сделано
+<!-- ai-kit:begin — AI kit fields (spec/04 §5); an AI kit update changes only the text between the marks -->
+## What was done
 
-<коротко>
+<briefly>
 
-Tasks: <номера task из tasks.md, например 2.1, 2.2>
-E2E: <файлы e2e, которые относятся к работе — их gate и executor гоняют до PR>
-Test layers: <каждый новый файл теста: путь — слой (unit / integration / e2e); у нового e2e — «не ниже: …», у нового файла e2e — ещё «не шагом: …»; или —>
-Screenshots: <маршруты экранов или —>
-Proof: <чем доказано: тесты; мутационная проверка — тест краснеет, если сломать код; bugfix — прогон красный до исправления и зелёный после>
-Depends on: <#N родительского PR или —>
-Issue: <ссылка>
-Models: <tier→точная модель ×N, например standard→claude-sonnet-5-5 ×2>
+Tasks: <task numbers from tasks.md, for example 2.1, 2.2>
+E2E: <e2e files related to the work — gate and the executor run them before the PR>
+Test layers: <each new test file: path — layer (unit / integration / e2e); a new e2e — «why not lower: …», a new e2e file — also «why not a step: …»; or —>
+Screenshots: <screen routes or —>
+Proof: <what proves it: tests; a mutation check — the test turns red if the code is broken; bugfix — a red run before the fix and a green one after>
+Depends on: <#N of the parent PR or —>
+Issue: <link>
+Models: <tier→exact model ×N, for example standard→claude-sonnet-5-5 ×2>
 
-<!-- Только spec PR, который меняет change (proposal, design, specs, новые task): строка «Change утвердил: <person>, <ГГГГ-ММ-ДД ЧЧ:ММ>, OI-N» и следующей строкой цитата слов человека «> <текст записи OI-N>». Взявший PR сам поменял change — ещё такая строка от своего человека. -->
-<!-- Только PR с ADR: строка «ADR вступит в силу после влития» и метка adr — вливается только с одобрением человека: на хостинге или его слово «вливай №N». -->
+<!-- Only a spec PR that changes a change (proposal, design, specs, new tasks): the line «Change approved: <person>, <YYYY-MM-DD HH:MM>, OI-N» and on the next line a quote of the human's words «> <text of record OI-N>». Whoever adopted the PR changed the change themselves — one more such line from their own human. -->
+<!-- Only a PR with an ADR: the line «ADR takes effect after merge» and the adr label — it is merged only with the human's approval: on the hosting or by their word «merge #N». -->
 
-## Как заденет коллег
+## How it affects colleagues
 
-— <или, если PR меняет ai-team-docs/ или AI kit: что изменится у коллег — со слов manager до PR; после влития watch коллег передаст это их manager>
+— <or, if the PR changes ai-team-docs/ or the AI kit: what changes for colleagues — from the manager's words before the PR; after merge the colleagues' watch passes it to their manager>
 
-## Конфликты
+## Conflicts
 
-— <или: файлы и как решено при rebase>
+— <or: files and how it was resolved on rebase>
 
-## Решения сверх requirement
+## Decisions beyond the requirement
 
-— <или: что решили сами, из DECISIONS отчётов subagent>
+— <or: what was decided on our own, from DECISIONS of subagent reports>
 <!-- ai-kit:end -->
