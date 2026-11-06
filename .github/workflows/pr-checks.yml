@@ -1,13 +1,13 @@
 # managed by AI kit
 # ai-kit-version: 0.3.0-dev
-# AI kit: проверки PR (spec/05 §1, §8). Собран `ai-team ci render` из project overlay — правка через overlay и повторный render.
-# Блоки «ai-kit:keep» сохраняются при повторном render — туда пишутся services и env проекта.
-# Draft PR — проверки пропускаются. Обязательные проверки для защиты ветки: pr-result и ai-review.
-# Описание PR читается через API, а не из события: поправили поля PR — достаточно «Re-run failed jobs» (событие edited
-# не используется: на правке заголовка пропущенные jobs отчитались бы зелёными поверх красных).
-# Шаги «setup: …» — настройка CI: упало там — «сломан CI», а не виноват PR (DEC-0071); остальные шаги — проверки PR.
-# Push в integration branch — те же проверки на её голове (без process guard и e2e PR): шаг проверки красный и там — «CI сломан»,
-# а не «виноват PR» у каждого PR (ai-team ci why, watch).
+# AI kit: PR checks (spec/05 §1, §8). Built by `ai-team ci render` from the project overlay — change it through the overlay and render again.
+# The «ai-kit:keep» blocks survive a repeated render — the project's services and env go there.
+# Draft PR — the checks are skipped. Required checks for the branch protection: pr-result and ai-review.
+# The PR description is read through the API, not from the event: PR fields fixed — «Re-run failed jobs» is enough (the edited event
+# is not used: on a title edit the skipped jobs would report green on top of red).
+# The «setup: …» steps are CI setup: red there means «CI is broken», not the PR's fault (DEC-0071); the other steps are PR checks.
+# A push to the integration branch — the same checks on its head (without process guard and the PR's e2e): a check step red there too means «CI is broken»,
+# not «the PR is at fault» for every PR (ai-team ci why, watch).
 name: pr-checks
 on:
   pull_request:
@@ -43,16 +43,16 @@ jobs:
         run: |
           npm ci --legacy-peer-deps
       - name: process guard
-        # Process guard сверяет PR (описание, зоны, правила команды) — у push в integration branch PR нет.
+        # Process guard checks the PR (description, zones, team rules) — a push to the integration branch has no PR.
         if: github.event_name != 'push'
         env:
           GH_TOKEN: ${{ github.token }}
           PR: ${{ github.event.pull_request.number }}
           GUARD_BASE: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha }}
         run: |
-          # На merge group описания PR нет — поля PR template и Tasks: там не проверяются.
+          # A merge group has no PR description — the PR template fields and Tasks: are not checked there.
           if [ -n "$PR" ]; then
-            body="$(gh pr view "$PR" -R "$GITHUB_REPOSITORY" --json body --jq .body)" || { echo "не прочитал описание PR #$PR"; exit 1; }
+            body="$(gh pr view "$PR" -R "$GITHUB_REPOSITORY" --json body --jq .body)" || { echo "could not read the description of PR #$PR"; exit 1; }
             export PR_BODY="$body"
           fi
           node .github/ai-team/process-guard.mjs --base "$GUARD_BASE"
@@ -63,7 +63,7 @@ jobs:
         run: |
           npm run lint
       - name: "setup: openspec"
-        # OpenSpec CLI на машине CI нет: ставится, только когда в PR есть openspec/ (change).
+        # The CI machine has no OpenSpec CLI: it is installed only when the PR has openspec/ (a change).
         if: hashFiles('openspec/**') != ''
         run: |
           command -v openspec >/dev/null || npm install -g @fission-ai/openspec@1 --no-fund --no-audit
@@ -75,14 +75,14 @@ jobs:
         run: |
           npm run build
   pr-result:
-    # Одна обязательная проверка вместо многих: пропущенное (draft, другое событие) — не красное.
+    # One required check instead of many: skipped (draft, another event) is not red.
     if: always()
     needs: [checks]
     runs-on: ubuntu-latest
     steps:
-      - name: итог
+      - name: result
         env:
           RESULTS: ${{ join(needs.*.result, ' ') }}
         run: |
-          for r in $RESULTS; do case "$r" in success|skipped) ;; *) echo "красное: $RESULTS"; exit 1 ;; esac; done
+          for r in $RESULTS; do case "$r" in success|skipped) ;; *) echo "red: $RESULTS"; exit 1 ;; esac; done
           echo "ok: $RESULTS"

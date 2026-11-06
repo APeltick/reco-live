@@ -84,6 +84,7 @@
 | team-docs-map | yes | файл в `ai-team-docs/`, которого нет в карте `ai-team-docs/README.md`, — красный PR |
 | people-ids | yes | id в `ai-team-docs/config/roles.md → people` без повторов (регистр не в счёт): один id — одна AI team |
 | bare-refs | no | ссылки на решения только `ADR-NNNN`, `ATD-NNNN`, `DEC-NNNN`, OQ в документах команды не упоминаются (spec/13 §7) |
+| specs-archive-only | no | `openspec/specs/**` is edited only in a PR that merges the archive of a change (the move to `openspec/changes/archive/<date>-<name>/`), and only for the capability whose delta is in the archive of the PR; symlinks and submodules in `openspec/specs` and in place of `openspec`, `openspec/specs` are forbidden; to switch on — `yes`; a PR that switches the rule on is still checked without it |
 
 ## forbidden-locators
 
@@ -240,3 +241,11 @@
 | adr | ai-kit | ADR: `ai-kit` — `docs/adr` по spec/13, `keep-own` — свои ADR, правило `adr` process guard выключено |
 | git_hooks | run | git-хуки проекта на коммитах AI kit installer: `run` — работают, `skip` — пропущены (причина — в AI kit setup report) |
 | ai:claude-md:CLAUDE.md | keep | оставлено: файл целиком — раздел AI kit, создан setup PR #1 (f28ca9c) 22.10, с тех пор не менялся; обновление меняет только текст между метками |
+
+## modules
+
+Switches of the AI kit options (DEC-0104, decision 3): a row `| <option id> | off | why |` — the option is off; `on` or no row — on; no section — all are on. An option that needs a disabled one (`requires` in its manifest `modules/<id>.mjs` of AI kit) is turned off after it. The core, the kernel and safety are not turned off: their row is only a warning. A disabled option removes nothing; to turn it back on — `on` or remove the row. The list of options — `docs/MODULES.md` of AI kit. A switch applies from the next `ai-team` command: a command already running and a long process (watchdog) keep the previous values until their next pass.
+
+| id | state | note |
+|---|---|---|
+| — | — | — |

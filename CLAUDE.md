@@ -1,21 +1,21 @@
 # reco-live
 
-<!-- ai-kit:begin — раздел AI kit. AI kit installer вставляет его в CLAUDE.md проекта; обновление AI kit меняет только текст между метками. -->
+<!-- ai-kit:begin — the AI kit section. The AI kit installer puts it into the project's CLAUDE.md; an AI kit update changes only the text between the marks. -->
 ## AI kit
 
-Проект ведут AI team по AI kit: manager (с ним говорит человек), lead, executor-N, integrator-N, reviewer-N. Каждый человек ведёт свою AI team; договорённости между людьми — через issue tracker, PR и git. Всё, что меняет поведение продукта, — только через issue.
+The project is run by AI teams by AI kit: manager (the human talks to it), lead, executor-N, integrator-N, reviewer-N. Each human runs their own AI team; agreements between people — through the issue tracker, PRs and git. Everything that changes product behavior — only through an issue.
 
-- **Термины** — только из словаря AI kit (`GLOSSARY.md` в папке AI kit у того, кто ведёт AI team): issue, change, task, task batch, brief, draft PR, `ai-review`, gate, merge group, returned PR, AI model tier, …
-- **Файлы AI kit в проекте** — `ai-team-docs/` (карта — его `README.md`): настройки флоу `config/project-overlay.md`, роли и люди `config/roles.md`, модели `config/models.md`, MCP для agents `config/mcp.json` (у каждого — только серверы, которые он включил у себя), ATD — решения о работе AI team `atd/`.
-- **Поведение продукта** — в спеках OpenSpec (`openspec/specs/`); решения «как и почему» о продукте — ADR проекта (`docs/adr/` или `adr_dir`). Решение — файл «как решено сейчас», рядом история (`history/`); поменялось — правится тот же файл с записью в истории, номер не меняется. ADR и ATD принимает только человек; так же — PR, который меняет правила команды (`ai-team-docs/config/`, `.github/ai-team/`, CI AI kit, этот раздел, настройки Claude Code проекта — `.claude/settings*.json`, `.claude/hooks/`, `.mcp.json`): вливается только по слову человека с номером PR.
-- **Каждая task в `tasks.md`** — с AI model tier: `[strong]`, `[standard]` или `[light]`. `[x]` ставит автор в своём PR.
-- **Тесты** — самый нижний слой, на котором проверка ещё ловит дефект: unit / integration / e2e (spec/05 AI kit).
-- **PR** — draft PR по PR template (`Tasks:`, `E2E:`, `Test layers:`, `Screenshots:`, `Proof:`, `Depends on:`, `Issue:`, `Models:`). Ревью ставит статус `ai-review`; влитие — по project overlay; integration branch защищена.
-- **Секреты**: `.env*` не читать целиком; имена переменных — `ai-team env-keys <файл>`. В текстах на хостинг (PR, комментарии) — без секретов: известный вид ключа или значение env-файла guard не пропустит.
-- **Процессы**: свои server — `ai-team server start|stop`; `pkill`/`killall` запрещены.
+- **Terms** — only from the AI kit glossary (`GLOSSARY.md` in the AI kit folder of whoever runs the AI team): issue, change, task, task batch, brief, draft PR, `ai-review`, gate, merge group, returned PR, AI model tier, …
+- **AI kit files in the project** — `ai-team-docs/` (the map — its `README.md`): flow settings `config/project-overlay.md`, roles and people `config/roles.md`, models `config/models.md`, MCP for agents `config/mcp.json` (each human has only the servers they enabled on their side), ATD — decisions on how the AI team works `atd/`.
+- **Product behavior** — in the OpenSpec specs (`openspec/specs/`); "how and why" decisions on the product — the project's ADRs (`docs/adr/` or `adr_dir`). A decision is a file "how it is decided now", with its history next to it (`history/`); if it changes, the same file is edited with an entry in the history, the number stays. ADRs and ATDs are accepted only by the human; the same for a PR that changes the team rules (`ai-team-docs/config/`, `.github/ai-team/`, CI AI kit, this section, the project's Claude Code settings — `.claude/settings*.json`, `.claude/hooks/`, `.mcp.json`): it is merged only by the human's word with the PR number.
+- **Each task in `tasks.md`** — with an AI model tier: `[strong]`, `[standard]` or `[light]`. The author puts `[x]` in their own PR.
+- **Tests** — the lowest layer at which the check still catches the defect: unit / integration / e2e (spec/05 of AI kit).
+- **PR** — a draft PR by the PR template (`Tasks:`, `E2E:`, `Test layers:`, `Screenshots:`, `Proof:`, `Depends on:`, `Issue:`, `Models:`). The review sets the `ai-review` status; the merge — by the project overlay; the integration branch is protected.
+- **Secrets**: do not read `.env*` whole; variable names — `ai-team env-keys <file>`. In texts for the hosting (PRs, comments) — no secrets.
+- **Processes**: your own servers — only `ai-team server start|stop`.
 
-### При compact сохранить
-<!-- rare: нужен только при compact контекста -->
+### Keep on compact
+<!-- rare: needed only when the context is compacted -->
 
-id agent и роль; текущий task batch и brief; task в работе и их статус; ветку, worktree, PR и PR dossier; изменённые файлы; блокеры и открытые вопросы; последнюю команду проверки и её итог; решения в этой сессии.
+The agent id and role; the current task batch and brief; the tasks in work and their status; the branch, worktree, PR and PR dossier; the changed files; blockers and open questions; the last check command and its result; the decisions in this session.
 <!-- ai-kit:end -->

@@ -1,57 +1,57 @@
 <!--
-Шаблон ADR проекта (DEC-0091 AI kit; тот же, что templates/decisions/full.md и minimal.md AI kit).
-Файл — ADR-NNNN-<slug>.md в этой папке. NNNN — следующий свободный номер: «ai-team adr-next» (с учётом открытых PR
-коллег). <slug> — коротко по-английски через дефис.
+The project's ADR template (DEC-0091 of the AI kit; the same as templates/decisions/full.md and minimal.md of the AI kit).
+The file is ADR-NNNN-<slug>.md in this folder. NNNN is the next free number: "ai-team adr-next" (it takes into account the open PRs
+of colleagues). <slug> — short, in English, with hyphens.
 
-Шаблон «полный» — когда в разговоре с человеком были варианты; вариантов не было — «минимум»: в шапке «Шаблон: минимум»,
-разделов «Варианты» и «Связанные» нет (связанные решения — пунктом в «Что из этого следует»). Варианты не выдумывать.
+The template "full" — when there were options in the conversation with the human; if there were none — "minimal": in the header
+"Template: minimal", no sections "Options" and "Related" (related decisions — an item in "Consequences"). Do not invent options.
 
-Рядом — история: history/<тот же файл> с одной записью «принято»:
+Next to it — the history: history/<the same file> with one "accepted" entry:
 
-# ADR-NNNN · <вопрос — как в заголовке решения> — история
+# ADR-NNNN · <question — as in the title of the decision> — history
 
-Новые записи сверху.
+Newest entries first.
 
-## <ГГГГ-ММ-ДД> · <автор: id человека, который принял решение> · принято
+## <YYYY-MM-DD> · <author: the id of the human who accepted the decision> · accepted
 
-**Почему:** <одна-две фразы: зачем решение понадобилось>
+**Why:** <one or two sentences: why the decision was needed>
 
-Поменять решение — правка этого же файла («Изменено:» — дата) и запись сверху в истории
-«## <ГГГГ-ММ-ДД> · <автор> · изменено» с «**Почему:**» и «**Было (до <ГГГГ-ММ-ДД>):**» — полный прежний текст в цитате
-(«> » в начале каждой строки; process guard сверяет его с текстом до правки, пробелы и HTML-комментарии не в счёт).
-Прежние записи не правятся. Отмена — статус «отменён» и запись «отменено» с «Почему».
-Файл не удаляется, номер не меняется. Индекс — «ai-team adr-index».
-Подсказки в <угловых скобках> заменить, этот комментарий удалить.
+To change a decision — edit this same file ("Changed:" — the date) and add an entry on top of the history
+"## <YYYY-MM-DD> · <author> · changed" with "**Why:**" and "**Was (before <YYYY-MM-DD>):**" — the full previous text in a quote
+("> " at the start of every line; the process guard compares it with the text before the edit, spaces and HTML comments do not count).
+Earlier entries are not edited. Revoking — the status "revoked" and an entry "revoked" with "Why".
+The file is not deleted, the number does not change. The index — "ai-team adr-index".
+Replace the hints in <angle brackets>, delete this comment.
 -->
-# ADR-NNNN · <Вопрос: что решаем — коротко, как заголовок>
+# ADR-NNNN · <Question: what we decide — short, like a heading>
 
-- **Статус:** действует
-- **Принято:** <ГГГГ-ММ-ДД> · **Изменено:** —
-- **Шаблон:** полный
-- **История:** [history/ADR-NNNN-<slug>.md](history/ADR-NNNN-<slug>.md)
+- **Status:** active
+- **Accepted:** <YYYY-MM-DD> · **Changed:** —
+- **Template:** full
+- **History:** [history/ADR-NNNN-<slug>.md](history/ADR-NNNN-<slug>.md)
 
-## Почему
+## Why
 
-<Контекст и проблема: что случилось или чего не хватает; живой пример. Два–пять предложений.>
+<The context and the problem: what happened or what is missing; a live example. Two to five sentences.>
 
-## Варианты
+## Options
 
-| Вариант | Плюсы | Минусы | Итог |
+| Option | Pros | Cons | Verdict |
 |---|---|---|---|
-| <вариант, который обсуждали с человеком> | <…> | <…> | нет |
-| **<выбранный вариант>** | <…> | <…> | **да** |
+| <an option that was discussed with the human> | <…> | <…> | no |
+| **<the chosen option>** | <…> | <…> | **yes** |
 
-<Поправки человека в обсуждении, если были. Варианты не выдумывать — только те, что обсуждали.>
+<The human's corrections in the discussion, if there were any. Do not invent options — only the ones that were discussed.>
 
-## Решение
+## Decision
 
-<Первое предложение — суть решения одной фразой: она попадёт в индекс. Дальше — подробности, можно нумерованным списком.>
+<The first sentence is the gist of the decision in one phrase: it goes into the index. Then the details, possibly a numbered list.>
 
-## Что из этого следует
+## Consequences
 
-- <что меняется: код, проверки, договорённости команды>
-- <что отложено и куда записано>
+- <what changes: code, checks, team agreements>
+- <what is postponed and where it is written down>
 
-## Связанные
+## Related
 
-<ID других решений (ADR-NNNN) с пояснением, чем связаны, через запятую.>
+<IDs of other decisions (ADR-NNNN) with a note on how they are related, separated by commas.>
