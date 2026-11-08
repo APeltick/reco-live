@@ -4,4 +4,4 @@
 
 ## 2. README (#33)
 
-- [ ] 2.1 [light] In `README.md` replace the heading `# Draft frontend template` with `# Reco Live` and the intro line `A strict React single-page application template for building maintainable client-side interfaces.` with `Reco Live — React single-page application.`; nothing else in the file changes. Verify: `git diff README.md` touches only these two lines; `grep -n "Draft frontend template\|template for building" README.md` finds nothing.
+- [x] 2.1 [light] In `README.md` replace the heading `# Draft frontend template` with `# Reco Live` and the intro line `A strict React single-page application template for building maintainable client-side interfaces.` with `Reco Live — React single-page application.`; nothing else in the file changes. Verify: `git diff README.md` touches only these two lines; `grep -n "Draft frontend template\|template for building" README.md` finds nothing.
