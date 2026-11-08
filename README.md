@@ -1,6 +1,6 @@
-# Draft frontend template
+# Reco Live
 
-A strict React single-page application template for building maintainable client-side interfaces.
+Reco Live — React single-page application.
 
 ## Stack
 
