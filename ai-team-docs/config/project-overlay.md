@@ -186,6 +186,7 @@
 | messages | 7 | длинные сообщения agents (`state/messages/`) |
 | drafts | 7 | черновики строки ввода (`state/drafts/`) |
 | metrics | — | шаги расхода токенов (`state/metrics/steps/`): `—` — всегда; прошлые месяцы — zip (остальные замеры — маленькие, хранятся всегда) |
+| limits_log | 90 | lines of `state/metrics/limits.jsonl` (subscription limit percent, written every 5 min) older than this are dropped by the nightly cleanup; `—` — forever. Other measurements (prs, events, gate, full, reviews, attempts, issues) are the record the process reads back and are never trimmed |
 
 ## data-policy
 
