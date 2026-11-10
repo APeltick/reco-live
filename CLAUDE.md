@@ -11,7 +11,7 @@ The project is run by AI teams by AI kit: manager (the human talks to it), lead,
 - **Each task in `tasks.md`** — with an AI model tier: `[strong]`, `[standard]` or `[light]`. The author puts `[x]` in their own PR.
 - **Tests** — the lowest layer at which the check still catches the defect: unit / integration / e2e (spec/05 of AI kit).
 - **PR** — a draft PR by the PR template (`Tasks:`, `E2E:`, `Test layers:`, `Screenshots:`, `Proof:`, `Depends on:`, `Issue:`, `Models:`). The review sets the `ai-review` status; the merge — by the project overlay; the integration branch is protected.
-- **Secrets**: do not read `.env*` whole; variable names — `ai-team env-keys <file>`. In texts for the hosting (PRs, comments) — no secrets.
+- **Secrets**: do not read or write `.env*` and `.secrets/` (examples — `.env.example` — are fine); variable names — `ai-team env-keys <file>`. In texts for the hosting (PRs, comments) — no secrets.
 - **Processes**: your own servers — only `ai-team server start|stop`.
 
 ### Keep on compact
