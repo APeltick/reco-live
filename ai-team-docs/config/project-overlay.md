@@ -17,7 +17,7 @@
 | human_approval_required | no | нужно ли одобрение PR человеком сверх `ai-review` и CI (approve другого человека: свой PR одобрить нельзя) |
 | issue_tracker | github-issues | github-issues / jira / linear / task-manager / none |
 | has_database | no | yes / no — `no` выключает шаги миграций в gate; в CI шаг миграций идёт, если у него есть команда (`commands`) |
-| ai_kit_min_version | 0.3.0-dev | минимальная версия AI kit для этого проекта |
+| ai_kit_min_version | 0.3.1-dev | минимальная версия AI kit для этого проекта |
 | timezone | Europe/Chisinau | часовой пояс команды: в нём время ночного full в CI (`schedule` → `nightly_full`) и границы суток в `ai-team stats`; задачи watchdog — по часам машины |
 
 ## commands
