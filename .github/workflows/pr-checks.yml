@@ -6,6 +6,7 @@
 # The PR description is read through the API, not from the event: PR fields fixed — «Re-run failed jobs» is enough (the edited event
 # is not used: on a title edit the skipped jobs would report green on top of red).
 # The «setup: …» steps are CI setup: red there means «CI is broken», not the PR's fault (DEC-0071); the other steps are PR checks.
+# ci-baseline (with lint or typecheck): warnings not more than in .github/ai-team/ci-baseline.json (DEC-0112); the base — `ai-team ci baseline`, through a PR.
 # A push to the integration branch — the same checks on its head (without process guard and the PR's e2e): a check step red there too means «CI is broken»,
 # not «the PR is at fault» for every PR (ai-team ci why, watch).
 name: pr-checks
@@ -31,6 +32,9 @@ jobs:
     # ai-kit:keep checks-env
     # ai-kit:keep-end
     steps:
+      - name: "setup: start time"
+        # The time of the checks for the ci-baseline step (DEC-0112).
+        run: echo "AI_TEAM_CI_T0=$(date +%s)" >> "$GITHUB_ENV"
       - name: "setup: checkout"
         uses: actions/checkout@v4
         with:
@@ -57,11 +61,25 @@ jobs:
           fi
           node .github/ai-team/process-guard.mjs --base "$GUARD_BASE"
       - name: typecheck
+        # The output also goes to a file for the ci-baseline step (DEC-0112): the command line first, as written (not expanded: no env values in the log);
+        # pipefail keeps the code of the command.
         run: |
+          set -o pipefail
+          {
+          cat <<'AI_KIT_CMD'
+          + npm run typecheck
+          AI_KIT_CMD
           npm run typecheck
+          } 2>&1 | tee "$RUNNER_TEMP/ai-kit-typecheck.log"
       - name: lint
         run: |
+          set -o pipefail
+          {
+          cat <<'AI_KIT_CMD'
+          + npm run lint
+          AI_KIT_CMD
           npm run lint
+          } 2>&1 | tee "$RUNNER_TEMP/ai-kit-lint.log"
       - name: "setup: openspec"
         # The CI machine has no OpenSpec CLI: it is installed only when the PR has openspec/ (a change).
         if: hashFiles('openspec/**') != ''
@@ -74,6 +92,14 @@ jobs:
       - name: build
         run: |
           npm run build
+      - name: ci-baseline — warnings and time against the base
+        # Warnings of lint and typecheck against .github/ai-team/ci-baseline.json of the base commit (a PR does not loosen its own threshold):
+        # more by over 10 % and by at least 1 — red, the PR's fault; the time — only a warning: shared CI machines jump by ±20 % (DEC-0112).
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha }}
+        run: |
+          if [ ! -f .github/ai-team/ci-baseline.mjs ]; then echo "not measured: no .github/ai-team/ci-baseline.mjs — update the AI kit"; exit 0; fi
+          node .github/ai-team/ci-baseline.mjs check --base "$BASE_SHA" --started "${AI_TEAM_CI_T0:-}" "$RUNNER_TEMP/ai-kit-typecheck.log" "$RUNNER_TEMP/ai-kit-lint.log"
   pr-result:
     # One required check instead of many: skipped (draft, another event) is not red.
     if: always()

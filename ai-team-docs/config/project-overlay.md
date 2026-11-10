@@ -207,6 +207,9 @@
 | e2e_audit_growth_pct | 20 | на сколько % full вырос с прошлого e2e audit — повод спросить operator про новый |
 | heavy_hold_alert_min | 120 | живой держатель heavy lock держит дольше стольких минут — одно сообщение lead «кто и что держит» (spec/09 §2) |
 | brief_files_max | 8 | сколько шаблонов «Файлы» в brief допустимо: больше — `ai-team brief-check` предупреждает «задача слишком широкая» (spec/03 §5) |
+| review_rounds | 2 | how many failed reviews a PR may have with the human present; the next failed review is the review round limit: the PR does not go back to the executor, lead and the operator decide (spec/06 §5, DEC-0110); `0` — no limit |
+| review_rounds_away | 3 | the same in away (spec/06 §5, DEC-0110); `0` — no limit |
+| agent_silent_min | 30 | minutes without a change of the pane and the transcript of an executor with a current brief, then the silent hang class (spec/09 §2, DEC-0111); `0` — the class is disabled |
 
 ## merge
 

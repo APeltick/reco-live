@@ -11,6 +11,18 @@ Proof: <what proves it: tests; a mutation check — the test turns red if the co
 Depends on: <#N of the parent PR or —>
 Issue: <link>
 Models: <tier→exact model ×N, for example standard→claude-sonnet-5-5 ×2>
+<!-- For a bugfix: the place of the cause — the file and the line where the symptom comes from; for a feature — —. -->
+Reason: <file:line — for a bugfix, where the cause is; for a feature —>
+
+<!-- Where the change enters from: a route, a command, a hook, a job, an event, a call from another module — and what else it may touch. -->
+## Door and blast radius
+
+<who or what calls the changed code, and what else it may break — or —>
+
+<!-- What it did before and what it does now; for a bugfix — the symptom and the fix. -->
+## Before / after
+
+<before → after, or —>
 
 <!-- Only a spec PR that changes a change (proposal, design, specs, new tasks): the line «Change approved: <person>, <YYYY-MM-DD HH:MM>, OI-N» and on the next line a quote of the human's words «> <text of record OI-N>». Whoever adopted the PR changed the change themselves — one more such line from their own human. -->
 <!-- Only a PR with an ADR: the line «ADR takes effect after merge» and the adr label — it is merged only with the human's approval: on the hosting or by their word «merge #N». -->
