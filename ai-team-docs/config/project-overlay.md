@@ -13,7 +13,7 @@
 | integration_branch | main | ветка, куда вливаются все PR |
 | branch_types | feature, bugfix, hotfix | типы веток `<тип>/<person>/<task-batch-id>` (DEC-0052): исправление ошибки — `bugfix`, остальное — `feature`, `hotfix` — только по слову человека |
 | merge_method | squash | merge / squash / rebase |
-| merge_authority | human | кто вливает (spec/04 §4): `human` / `merge-queue` / `integrator` |
+| merge_authority | integrator | кто вливает (spec/04 §4): `human` / `merge-queue` / `integrator` |
 | human_approval_required | no | нужно ли одобрение PR человеком сверх `ai-review` и CI (approve другого человека: свой PR одобрить нельзя) |
 | issue_tracker | github-issues | github-issues / jira / linear / task-manager / none |
 | has_database | no | yes / no — `no` выключает шаги миграций в gate; в CI шаг миграций идёт, если у него есть команда (`commands`) |
