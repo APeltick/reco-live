@@ -1,0 +1,7 @@
+## 1. Docs of npm run check
+
+- [ ] 1.1 [light] In `docs/installation/README.md` (the line after the `npm run check` block, ~:41) and `docs/eslint/README.md` (~:99) describe `npm run check` as it is in `package.json`: type checking, linters (ESLint, Stylelint), unit tests (`npm run test`), production build — in this order; nothing else in the files changes. Verify: `grep -n "npm run check" -A2 docs/installation/README.md docs/eslint/README.md` shows the test step; the order matches the `check` script in `package.json`; `git diff --stat` — only these two files.
+
+## 2. request.ts unit tests
+
+- [ ] 2.1 [standard] Add to `src/shared/api/request.test.ts`, with the existing stubs (`vi.stubGlobal` fetch, `vi.stubEnv`, mocked `~shared/lib/error-report`): (a) `domain` — the request goes to `<domain>/<path>`, not to `VITE_APP_API_URL`, with and without a trailing slash in `domain`; (b) `sendErrorReport` throws (mock implementation throws) on a network failure and on a non-2xx — `request()` still throws the original `RequestError` (message and `response`/`cause` as without the throw); (c) a body that cannot be serialized (`BigInt` value, circular object) — throws `RequestError("Request body cannot be serialized as JSON.")` with `cause` set, `fetch` is not called. No change to `request.ts`. Verify: `npm run check` passes; break each path on purpose in a scratch copy (drop `domain ??`, remove the `try` in `reportError`, remove the `try` in `serializeJsonBody`) → the matching test fails; restore; `git diff --stat` — only the test file and `tasks.md`.
