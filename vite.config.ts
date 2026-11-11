@@ -43,8 +43,6 @@ export default defineConfig({
     environment: "node",
     // Collects unit tests that live next to the source code.
     include: ["src/**/*.test.ts"],
-    // Temporary: lets the empty test suite pass until the first tests are added.
-    passWithNoTests: true,
   },
   preview: {
     // Binds the production preview server to the local machine only.
