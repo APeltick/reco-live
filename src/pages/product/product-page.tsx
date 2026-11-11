@@ -6,10 +6,7 @@ export function ProductPage() {
     collection,
     error,
     isError,
-  } = useFetchProducts({
-    _page: 1,
-    _per_page: 10,
-  });
+  } = useFetchProducts();
 
   if (isError) {
     const errorMessage = error instanceof Error
@@ -20,7 +17,10 @@ export function ProductPage() {
   }
   return (
     <Stack spacing={2}>
-      {collection?.data.map((product) => (
+      {collection !== null && (
+        <p>{`${String(collection.total)} products found`}</p>
+      )}
+      {collection?.products.map((product) => (
         <p key={product.id}>{product.title}</p>
       ))}
     </Stack>

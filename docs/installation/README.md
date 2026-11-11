@@ -39,3 +39,11 @@ npm run check
 ```
 
 `npm run check` type-checks the application, runs all linters, and creates a production build.
+
+## Configure the API
+
+The product catalog is loaded from the public DummyJSON API. Put this line into your local env file (no secrets):
+
+```sh
+VITE_APP_API_URL=https://dummyjson.com
+```

@@ -5,12 +5,17 @@ export {
   selectProductsCollection,
 } from "./product-slice";
 export {
+  CategoriesSchema,
+  CategorySchema,
   ProductSchema,
   ProductsCollectionSchema,
 } from "./product.schemas";
 export type {
-  GetProductsParams,
+  Categories,
+  Category,
   Product,
   ProductsCollection,
+  ProductsPaging,
+  ProductsQuery,
 } from "./product.types";
 export { useFetchProducts } from "./use-fetch-products";
