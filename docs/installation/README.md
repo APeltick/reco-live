@@ -18,6 +18,18 @@ npm ci --legacy-peer-deps
 
 Use `npm install` only when intentionally adding or updating dependencies. Commit both `package.json` and `package-lock.json` after such a change. This project has one temporary, explicitly documented peer-dependency exception; follow the [installation and update procedure](../development/README.md#install-and-update-dependencies) instead of enabling a global npm override.
 
+## Browsers for screenshots
+
+Taking screenshots of the UI with `ai-team screenshots capture` needs a Chromium browser controlled by Playwright. Install it after `npm ci`:
+
+```sh
+npx --no-install playwright install chromium
+```
+
+- The step is needed only for UI screenshots (`ai-team screenshots capture`).
+- It installs Chromium only, together with its headless shell. The download is about 300 MB and happens once per machine: the browser goes into the Playwright browser cache, which is shared by all worktrees, so later runs and other worktrees reuse it.
+- `--no-install` makes `npx` use the project's own `playwright` CLI from `@playwright/test` (`devDependencies`). The CLI itself is not downloaded from the network.
+
 ## Verify the environment
 
 ```sh
