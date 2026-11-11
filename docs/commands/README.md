@@ -9,10 +9,11 @@
 | `npm run lint:styles` | Runs Stylelint against CSS files and CSS tagged templates in TypeScript and TSX source files. |
 | `npm run lint:styles:fix` | Runs Stylelint and applies automatic CSS fixes where available. Review the resulting diff. |
 | `npm run lint` | Runs ESLint followed by Stylelint. |
+| `npm run test` | Runs unit tests once with Vitest in the Node.js environment (`src/**/*.test.ts`). |
 | `npm run build` | Type-checks the project and creates a Vite production build in `dist/`. |
 | `npm run preview` | Serves the existing production build locally. |
 | `npm run audit` | Reports production dependency vulnerabilities with severity `high` or `critical` (`npm audit --omit=dev --audit-level=high`). Dev dependencies are not included; use plain `npm audit` for them and see [known issues](../issues/README.md). |
-| `npm run check` | Runs type checking, both linters, and the production build. This is the local quality gate. |
+| `npm run check` | Runs type checking, both linters, unit tests, and the production build, in this order. This is the local quality gate. |
 
 ## Recommended workflow
 
