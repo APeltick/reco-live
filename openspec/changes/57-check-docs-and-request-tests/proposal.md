@@ -1,6 +1,6 @@
 ## Why
 
-Follow-up of the review of PR #54 (change `7-dev-tooling`, issue #57; opened by lead on the operator's standing rule OI-1171). Since #54 `npm run check` runs typecheck → lint → test → build, but two docs still describe it without tests; and three paths of `src/shared/api/request.ts` have no unit test.
+Follow-up of the review of PR #54 (change `7-dev-tooling`). Issue #57 was opened by lead on the operator's standing rule (OI-1171). Since #54 `npm run check` runs typecheck → lint → test → build, but two docs still describe it without tests; and three paths of `src/shared/api/request.ts` have no unit test.
 
 ## What Changes
 
