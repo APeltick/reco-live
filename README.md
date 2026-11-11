@@ -20,7 +20,7 @@ npm run dev
 
 The development server is available only on `127.0.0.1`. Vite prints the exact URL and port after startup.
 
-Before opening a pull request or submitting the project, run:
+Before opening a pull request, run:
 
 ```sh
 npm run check
