@@ -1,6 +1,10 @@
+import Alert from "@mui/material/Alert";
+import Button from "@mui/material/Button";
+import LinearProgress from "@mui/material/LinearProgress";
 import MenuItem from "@mui/material/MenuItem";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
 import {
   useEffect,
   useState,
@@ -21,8 +25,11 @@ const SEARCH_DEBOUNCE_MS = 300;
 const T_T_DEV = {
   allCategories: "All categories",
   categoryLabel: "Category",
+  loading: "Loading products",
   noProducts: "No products found",
+  retry: "Try again",
   searchLabel: "Search products",
+  loadError: "Could not load products.",
 } as const;
 
 export function ProductPage() {
@@ -70,8 +77,9 @@ export function ProductPage() {
 
   const {
     collection,
-    error,
     isError,
+    isFetching,
+    refetch,
   } = useFetchProducts(query);
 
   function handleCategoryChange(slug: string) {
@@ -121,18 +129,33 @@ export function ProductPage() {
           </MenuItem>
         ))}
       </TextField>
+      {isFetching && (
+        <LinearProgress
+          aria-label={T_T_DEV.loading}
+          data-testid="products-loader"
+        />
+      )}
       {isError && (
-        <p role="alert">
-          {error instanceof Error ? error.message : "Products request failed."}
-        </p>
+        <Alert
+          action={(
+            <Button color="inherit" onClick={refetch} size="small">
+              {T_T_DEV.retry}
+            </Button>
+          )}
+          severity="error"
+        >
+          {T_T_DEV.loadError}
+        </Alert>
       )}
-      {!isError && collection !== null && (
-        <p>
-          {collection.products.length === 0
-            ? T_T_DEV.noProducts
-            : `${String(collection.total)} products found`}
-        </p>
-      )}
+      <Typography
+        aria-live="polite"
+        data-testid="products-status"
+        role="status"
+      >
+        {!isError && collection !== null && (collection.products.length === 0
+          ? T_T_DEV.noProducts
+          : `${String(collection.total)} products found`)}
+      </Typography>
       {!isError && collection?.products.map((product) => (
         <p key={product.id}>{product.title}</p>
       ))}

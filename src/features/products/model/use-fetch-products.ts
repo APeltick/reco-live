@@ -6,7 +6,10 @@ import type {
 } from "./product.types";
 import type { FetchState } from "~shared/lib/hooks";
 
-import { useCallback } from "react";
+import {
+  useCallback,
+  useRef,
+} from "react";
 import {
   useDispatch,
   useSelector,
@@ -41,13 +44,30 @@ export function useFetchProducts(
   const { limit, skip } = paging;
   const queryKind = query.kind;
   const queryValue = getQueryValue(query);
+  const controllerReference = useRef<AbortController | null>(null);
 
   const fetchProducts = useCallback(async () => {
+    // Latest request wins: a new run aborts the previous one.
+    controllerReference.current?.abort();
+    const controller = new AbortController();
+
+    controllerReference.current = controller;
+    const { signal } = controller;
+
     const currentQuery = toQuery(queryKind, queryValue);
-    const receivedProducts = await getProducts(currentQuery, {
-      limit,
-      skip,
-    });
+    const receivedProducts = await getProducts(
+      currentQuery,
+      {
+        limit,
+        skip,
+      },
+      signal,
+    );
+
+    // A stale response must never replace a newer result.
+    if (signal.aborted) {
+      throw new DOMException("Superseded by a newer request.", "AbortError");
+    }
 
     dispatch(productsReceived(receivedProducts));
 
