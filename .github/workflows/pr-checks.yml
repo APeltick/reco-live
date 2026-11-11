@@ -1,5 +1,5 @@
 # managed by AI kit
-# ai-kit-version: 0.3.0-dev
+# ai-kit-version: 0.3.1-dev
 # AI kit: PR checks (spec/05 §1, §8). Built by `ai-team ci render` from the project overlay — change it through the overlay and render again.
 # The «ai-kit:keep» blocks survive a repeated render — the project's services and env go there.
 # Draft PR — the checks are skipped. Required checks for the branch protection: pr-result and ai-review.
