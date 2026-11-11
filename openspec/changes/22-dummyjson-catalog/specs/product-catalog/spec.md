@@ -67,7 +67,7 @@ At most one of search and category SHALL be active. Choosing a category SHALL cl
 
 ### Requirement: Search and category in the URL
 
-The active search SHALL be kept in the query parameter `q`, the active category in `category`; never both. Opening `/product?q=<text>` or `/product?category=<slug>` SHALL show the same result as entering it on the page, with the field or select filled in. Each change of search or category SHALL add a browser history entry, so Back restores the previous state. If both parameters are present in an opened URL, `category` SHALL win and `q` SHALL be removed from the URL. An unknown category slug SHALL show the empty result.
+The active search SHALL be kept in the query parameter `q`, the active category in `category`; never both. Opening `/product?q=<text>` or `/product?category=<slug>` SHALL show the same result as entering it on the page, with the field or select filled in. Each change of search or category SHALL add a browser history entry, so Back restores the previous state.
 
 #### Scenario: Link with a search
 
@@ -84,6 +84,10 @@ The active search SHALL be kept in the query parameter `q`, the active category 
 - **WHEN** the user searched `phone`, then chose the category `laptops`, then pressed Back
 - **THEN** the URL is `/product?q=phone`, `Search products` shows `phone`, `Category` shows `All categories`, and the search results for `phone` are shown
 
+### Requirement: Links with conflicting or unknown parameters
+
+If both `q` and `category` are present in an opened URL, `category` SHALL win and `q` SHALL be removed from the URL without a new history entry. An unknown category slug SHALL show the empty result.
+
 #### Scenario: Both parameters in a link
 
 - **WHEN** the user opens `/product?q=phone&category=laptops`
@@ -94,9 +98,9 @@ The active search SHALL be kept in the query parameter `q`, the active category 
 - **WHEN** the user opens `/product?category=nope` and the API returns `{ products: [], total: 0 }`
 - **THEN** `No products found` is shown
 
-### Requirement: Loading, empty and error messages
+### Requirement: Empty and error messages
 
-While the list is loading — on the first load and on every new search, category or retry — the page SHALL show a loading indicator. A result with no products SHALL show `No products found` (and no list). A failed request (network, non-2xx, or a response of the wrong shape) SHALL show an MUI error alert with the text `Could not load products.` (no technical details) and a `Try again` button that repeats the same request. A response for an older search or category SHALL NOT replace the result of a newer one.
+A result with no products SHALL show `No products found` (and no list). A failed request (network, non-2xx, or a response of the wrong shape) SHALL show an MUI error alert with the text `Could not load products.` (no technical details) and a `Try again` button that repeats the same request.
 
 #### Scenario: Empty result
 
@@ -108,10 +112,18 @@ While the list is loading — on the first load and on every new search, categor
 - **WHEN** the products request fails
 - **THEN** an error alert `Could not load products.` with `Try again` is shown; pressing it sends the same request again
 
+### Requirement: Loading indicator
+
+While the list is loading — on the first load and on every new search, category or retry — the page SHALL show a loading indicator.
+
 #### Scenario: Loading on a new query
 
 - **WHEN** the full list is shown and the user chooses the category `laptops`
 - **THEN** a loading indicator is shown until the products of `laptops` arrive
+
+### Requirement: Latest request wins
+
+A response for an older search or category SHALL NOT replace the result of a newer one.
 
 #### Scenario: Latest request wins
 
