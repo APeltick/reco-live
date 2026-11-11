@@ -29,7 +29,7 @@ export const ProductSchema = z.object({
   description: z.string(),
   dimensions: DimensionsSchema,
   discountPercentage: z.number(),
-  id: z.string(),
+  id: z.number(),
   images: z.array(z.string()),
   meta: MetaSchema,
   minimumOrderQuantity: z.number(),
@@ -48,11 +48,16 @@ export const ProductSchema = z.object({
 });
 
 export const ProductsCollectionSchema = z.object({
-  data: z.array(ProductSchema),
-  first: z.number(),
-  items: z.number(),
-  last: z.number(),
-  next: z.number().nullable(),
-  pages: z.number(),
-  prev: z.number().nullable(),
+  limit: z.number(),
+  products: z.array(ProductSchema),
+  skip: z.number(),
+  total: z.number(),
 });
+
+export const CategorySchema = z.object({
+  name: z.string(),
+  slug: z.string(),
+  url: z.string(),
+});
+
+export const CategoriesSchema = z.array(CategorySchema);

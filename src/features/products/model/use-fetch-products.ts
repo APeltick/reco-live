@@ -1,11 +1,15 @@
 import type {
-  GetProductsParams,
   Product,
   ProductsCollection,
+  ProductsPaging,
+  ProductsQuery,
 } from "./product.types";
 import type { FetchState } from "~shared/lib/hooks";
 
-import { useCallback } from "react";
+import {
+  useCallback,
+  useRef,
+} from "react";
 import {
   useDispatch,
   useSelector,
@@ -24,28 +28,51 @@ interface UseFetchProductsResult extends FetchState {
   data: Product[];
 }
 
-const PARAM_DEFAULT_PAGE = 1;
-const PARAM_DEFAULT_PER_PAGE = 10;
+const DEFAULT_QUERY: ProductsQuery = { kind: "all" };
+const DEFAULT_PAGING: ProductsPaging = {
+  limit: 10,
+  skip: 0,
+};
 
 export function useFetchProducts(
-  params: GetProductsParams = {},
+  query: ProductsQuery = DEFAULT_QUERY,
+  paging: ProductsPaging = DEFAULT_PAGING,
 ): UseFetchProductsResult {
   const dispatch = useDispatch();
   const collection = useSelector(selectProductsCollection);
   const data = useSelector(selectProducts);
-  const page = params._page ?? PARAM_DEFAULT_PAGE;
-  const perPage = params._per_page ?? PARAM_DEFAULT_PER_PAGE;
+  const { limit, skip } = paging;
+  const queryKind = query.kind;
+  const queryValue = getQueryValue(query);
+  const controllerReference = useRef<AbortController | null>(null);
 
   const fetchProducts = useCallback(async () => {
-    const receivedProducts = await getProducts({
-      _page: page,
-      _per_page: perPage,
-    });
+    // Latest request wins: a new run aborts the previous one.
+    controllerReference.current?.abort();
+    const controller = new AbortController();
+
+    controllerReference.current = controller;
+    const { signal } = controller;
+
+    const currentQuery = toQuery(queryKind, queryValue);
+    const receivedProducts = await getProducts(
+      currentQuery,
+      {
+        limit,
+        skip,
+      },
+      signal,
+    );
+
+    // A stale response must never replace a newer result.
+    if (signal.aborted) {
+      throw new DOMException("Superseded by a newer request.", "AbortError");
+    }
 
     dispatch(productsReceived(receivedProducts));
 
     return receivedProducts;
-  }, [dispatch, page, perPage]);
+  }, [dispatch, limit, queryKind, queryValue, skip]);
 
   const fetchState = useFetch(fetchProducts);
 
@@ -54,4 +81,41 @@ export function useFetchProducts(
     data,
     ...fetchState,
   };
+}
+
+function getQueryValue(query: ProductsQuery): string {
+  switch (query.kind) {
+    case "all": {
+      return "";
+    }
+    case "category": {
+      return query.slug;
+    }
+    case "search": {
+      return query.q;
+    }
+  }
+}
+
+function toQuery(
+  kind: ProductsQuery["kind"],
+  value: string,
+): ProductsQuery {
+  switch (kind) {
+    case "all": {
+      return DEFAULT_QUERY;
+    }
+    case "category": {
+      return {
+        kind,
+        slug: value,
+      };
+    }
+    case "search": {
+      return {
+        kind,
+        q: value,
+      };
+    }
+  }
 }

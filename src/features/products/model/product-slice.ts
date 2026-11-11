@@ -43,5 +43,5 @@ export function selectProductsCollection(
 export function selectProducts(
   state: ProductStoreState,
 ): Product[] {
-  return state.products.collection?.data ?? EMPTY_PRODUCTS;
+  return state.products.collection?.products ?? EMPTY_PRODUCTS;
 }

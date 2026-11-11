@@ -1,1 +1,6 @@
-export { getProducts } from "./get-products";
+export {
+  createCategoriesUrl,
+  createProductsUrl,
+  getCategories,
+  getProducts,
+} from "./get-products";
