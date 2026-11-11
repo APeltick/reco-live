@@ -14,6 +14,7 @@
 | `npm run preview` | Serves the existing production build locally. |
 | `npm run audit` | Reports production dependency vulnerabilities with severity `high` or `critical` (`npm audit --omit=dev --audit-level=high`). Dev dependencies are not included; use plain `npm audit` for them and see [known issues](../issues/README.md). |
 | `npm run check` | Runs type checking, both linters, unit tests, and the production build, in this order. This is the local quality gate. |
+| `npm run spec:validate` | Validates all OpenSpec changes and specs strictly (`openspec validate --all --strict`) with the project-pinned OpenSpec CLI from `node_modules`. The OpenSpec version is pinned in `package.json` and in `ai-team-docs/config/project-overlay.md` → `commands.openspec_validate` — bump both together. |
 
 ## Recommended workflow
 
