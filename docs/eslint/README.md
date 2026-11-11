@@ -96,4 +96,4 @@ File-wide suppression through @ts-nocheck is not allowed.
 npm run check
 ```
 
-The command runs type checking, ESLint, Stylelint, and a production build. ESLint is configured with `--max-warnings 0`, so warnings also fail the gate.
+The command runs type checking, ESLint, Stylelint, unit tests, and a production build. ESLint is configured with `--max-warnings 0`, so warnings also fail the gate.

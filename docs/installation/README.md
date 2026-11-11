@@ -38,7 +38,7 @@ npm --version
 npm run check
 ```
 
-`npm run check` type-checks the application, runs all linters, and creates a production build.
+`npm run check` type-checks the application, runs all linters, runs unit tests, and creates a production build.
 
 ## Configure the API
 
