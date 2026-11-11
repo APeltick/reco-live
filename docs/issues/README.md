@@ -98,7 +98,7 @@ The fixed release cannot be adopted directly because the lint toolchain does not
 
 ```text
 minimatch@10.2.5                                   (affected: inside >=7.0.0 <11.0.1)
-├── eslint-plugin-import-x@4.17.1                  (declares ^9.0.3 || ^10.1.2)
+├── eslint-plugin-import-x@4.18.1                  (declares ^9.0.3 || ^10.1.2 || ^11.0.1; resolves to 10.2.5)
 ├── @typescript-eslint/typescript-estree           (8.62.0 and nested 8.64.0 copies; declares ^10.2.2; used by eslint-plugin-perfectionist, eslint-plugin-react-dom, eslint-plugin-react-x, typescript-eslint and others)
 ├── @eslint/config-array@0.23.5                    (declares ^10.2.4; used by eslint)
 ├── eslint@10.6.0                                  (declares ^10.2.4)
@@ -107,9 +107,9 @@ minimatch@3.1.5                                    (not affected: outside >=7.0.
 └── eslint-plugin-jsx-a11y@6.10.2                  (declares ^3.1.2)
 ```
 
-Because the declared ranges of the consumers of `minimatch@10.2.5` exclude `11.x`, the lockfile cannot resolve to the fixed release without updating those packages. `npm audit --package-lock-only` lists `minimatch 7.0.0 - 11.0.0` as moderate and reports the lint packages that depend on the affected copy: `eslint`, `@eslint/config-array`, `@eslint/js`, `eslint-plugin-import-x`, `eslint-plugin-sonarjs`, `eslint-plugin-unicorn`, `typescript-eslint` and the `@typescript-eslint/*` packages (`typescript-estree`, `utils`, `parser`, `type-utils`, `eslint-plugin`). `eslint-plugin-jsx-a11y` is not reported, because its copy `minimatch@3.1.5` is outside the affected range. A non-breaking fix (`isSemVerMajor: false`) exists only for `eslint-plugin-import-x` (4.17.1 to 4.18.1, tracked in issue #44); even after it, the other consumers keep `minimatch@10.2.5` and the advisory stays open. For the rest, the only fix offered is `npm audit fix --force`, which is a breaking change.
+Because the declared ranges of the other consumers of `minimatch@10.2.5` exclude `11.x`, the lockfile cannot resolve to the fixed release without updating those packages; `eslint-plugin-import-x@4.18.1` accepts `^11.0.1`, but it shares the single `minimatch@10.2.5` copy with them. `npm audit --package-lock-only` lists `minimatch 7.0.0 - 11.0.0` as moderate and reports the lint packages that depend on the affected copy directly or through `eslint`: `eslint`, `@eslint/config-array`, `eslint-plugin-sonarjs`, `typescript-eslint` and the `@typescript-eslint/*` packages (`typescript-estree`, `utils`, `parser`, `type-utils`, `eslint-plugin`) reach it directly, while `@eslint/js` and `eslint-plugin-unicorn` reach it only through their peer dependency on `eslint`. `eslint-plugin-import-x` is no longer reported after the update to 4.18.1 (issue #44), and `eslint-plugin-jsx-a11y` is not reported, because its copy `minimatch@3.1.5` is outside the affected range. The update of `eslint-plugin-import-x` from 4.17.1 to 4.18.1 (issue #44) did not remove the affected copy: the lockfile still resolves `minimatch@10.2.5` for import-x, and no non-breaking fix is left. `npm audit --json` reports `isSemVerMajor: true` for every fix it names (`eslint` 9.39.5, `eslint-plugin-sonarjs` 2.0.0, `eslint-plugin-unicorn` 65.0.1, `typescript-eslint` 8.36.0, `@eslint/js` 9.39.5), and only `true` for `@eslint/config-array` and `@typescript-eslint/type-utils`, which follow from those forced fixes. `npm audit fix` changes nothing; only `npm audit fix --force` does, and it is a breaking change. The advisory stays open while the other consumers keep `minimatch@10.2.5`.
 
-The vulnerable copies are reached only through `devDependencies`: `npm ls minimatch --omit=dev --package-lock-only` is empty. The pre-push gate `npm run audit` is production-only (`npm audit --omit=dev --audit-level=high`), so it does not see this advisory and passes while this entry is open. A plain `npm audit` still reports it. The exposure is limited to developer machines and CI jobs that run ESLint against file patterns the project controls, not to user input or the running application.
+The affected copy is reached only through `devDependencies`: `npm ls minimatch --omit=dev --package-lock-only` is empty. The pre-push gate `npm run audit` is production-only (`npm audit --omit=dev --audit-level=high`), so it does not see this advisory and passes while this entry is open. A plain `npm audit` still reports it. The exposure is limited to developer machines and CI jobs that run ESLint against file patterns the project controls, not to user input or the running application.
 
 It cannot be permanently fixed yet because the fix requires the lint packages to accept `minimatch@11` in their own dependency ranges, which is an upstream change to those packages.
 
@@ -132,7 +132,7 @@ Limitations and actions that must not be taken:
 - Do not add `overrides` that force `minimatch` to 11 (team decision OI-413: this entry is documentation only). The installed lint packages declare ranges that exclude 11.x, so forcing it breaks their dependency contract.
 - Do not pick a lint package version from the `npm audit` output. Choose versions only after checking their declared `minimatch` range and release notes.
 - Do not add an ignore tool (`audit-ci`, `better-npm-audit` or similar) only to silence this advisory.
-- Do not switch the `audit` script to a full `npm audit` without a decision from the team, because the pre-push gate would then fail on a dev-only issue with no non-breaking fix for most of the reported packages.
+- Do not switch the `audit` script to a full `npm audit` without a decision from the team, because the pre-push gate would then fail on a dev-only issue with no non-breaking fix for the reported packages.
 
 ### Tracking links
 

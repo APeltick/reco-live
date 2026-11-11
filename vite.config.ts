@@ -1,7 +1,7 @@
 import babel from "@rolldown/plugin-babel";
 import react, { reactCompilerPreset } from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
+import { defineConfig } from "vitest/config";
 
 // Vite configuration reference: https://vite.dev/config/
 export default defineConfig({
@@ -37,6 +37,12 @@ export default defineConfig({
     host: "127.0.0.1",
     // Fails instead of silently choosing another port when the port is occupied.
     strictPort: true,
+  },
+  test: {
+    // Runs unit tests in Node.js without a browser DOM.
+    environment: "node",
+    // Collects unit tests that live next to the source code.
+    include: ["src/**/*.test.ts"],
   },
   preview: {
     // Binds the production preview server to the local machine only.
