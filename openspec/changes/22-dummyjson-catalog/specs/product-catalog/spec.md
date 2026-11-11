@@ -23,9 +23,9 @@ The list SHALL show at most the first 10 products of the current result and the 
 - **WHEN** the API returns 10 products with `total: 194`
 - **THEN** 10 product titles and `194 products found` are shown
 
-### Requirement: Search by title
+### Requirement: Search products
 
-The page SHALL have a search field labelled `Search products`. When the user stops typing for about 300 ms, the list SHALL be loaded from `GET /products/search?q=<text>&limit=10&skip=0` with the trimmed text. An empty or whitespace-only field SHALL show the full list. Typing SHALL NOT send a request per keystroke.
+The page SHALL have a search field labelled `Search products`. When the user stops typing for about 300 ms, the list SHALL be loaded from `GET /products/search?q=<text>&limit=10&skip=0` with the trimmed text; which products match is decided by the API (DummyJSON matches the title and other text fields). When no category is selected, an empty or whitespace-only search SHALL show the full list. Typing SHALL NOT send a request per keystroke.
 
 #### Scenario: User searches
 
@@ -34,7 +34,7 @@ The page SHALL have a search field labelled `Search products`. When the user sto
 
 #### Scenario: User clears the search
 
-- **WHEN** the user clears the search field
+- **WHEN** no category is selected and the user clears the search field
 - **THEN** the full list (`GET /products?limit=10&skip=0`) is shown
 
 ### Requirement: Filter by category
@@ -46,9 +46,14 @@ The page SHALL have a category select labelled `Category`, with the option `All 
 - **WHEN** the user chooses `Smartphones` in `Category`
 - **THEN** the products of `GET /products/category/smartphones?limit=10&skip=0` and their total are shown
 
+#### Scenario: Categories cannot be loaded
+
+- **WHEN** `GET /products/categories` fails
+- **THEN** `Category` offers only `All categories`, the full list is shown and search still works
+
 ### Requirement: Search and category are mutually exclusive
 
-At most one of search and category SHALL be active. Choosing a category SHALL clear the search field; entering search text SHALL reset the category to `All categories`.
+At most one of search and category SHALL be active. Choosing a category SHALL clear the search field at once; a search SHALL reset the category to `All categories` when it is applied (after the typing pause).
 
 #### Scenario: Category clears search
 
@@ -77,11 +82,21 @@ The active search SHALL be kept in the query parameter `q`, the active category 
 #### Scenario: Back restores the previous state
 
 - **WHEN** the user searched `phone`, then chose the category `laptops`, then pressed Back
-- **THEN** the URL is `/product?q=phone` and the search results for `phone` are shown
+- **THEN** the URL is `/product?q=phone`, `Search products` shows `phone`, `Category` shows `All categories`, and the search results for `phone` are shown
+
+#### Scenario: Both parameters in a link
+
+- **WHEN** the user opens `/product?q=phone&category=laptops`
+- **THEN** the URL becomes `/product?category=laptops` without a new history entry, the search field is empty and the products of `laptops` are shown
+
+#### Scenario: Unknown category in a link
+
+- **WHEN** the user opens `/product?category=nope` and the API returns `{ products: [], total: 0 }`
+- **THEN** `No products found` is shown
 
 ### Requirement: Loading, empty and error messages
 
-While the list is loading the page SHALL show a loading indicator. A result with no products SHALL show `No products found` (and no list). A failed request (network, non-2xx, or a response of the wrong shape) SHALL show an error message in an MUI alert with a `Try again` button that repeats the same request. A response for an older search or category SHALL NOT replace the result of a newer one.
+While the list is loading — on the first load and on every new search, category or retry — the page SHALL show a loading indicator. A result with no products SHALL show `No products found` (and no list). A failed request (network, non-2xx, or a response of the wrong shape) SHALL show an MUI error alert with the text `Could not load products.` (no technical details) and a `Try again` button that repeats the same request. A response for an older search or category SHALL NOT replace the result of a newer one.
 
 #### Scenario: Empty result
 
@@ -91,7 +106,17 @@ While the list is loading the page SHALL show a loading indicator. A result with
 #### Scenario: Request fails
 
 - **WHEN** the products request fails
-- **THEN** an error alert with `Try again` is shown; pressing it sends the same request again
+- **THEN** an error alert `Could not load products.` with `Try again` is shown; pressing it sends the same request again
+
+#### Scenario: Loading on a new query
+
+- **WHEN** the full list is shown and the user chooses the category `laptops`
+- **THEN** a loading indicator is shown until the products of `laptops` arrive
+
+#### Scenario: Latest request wins
+
+- **WHEN** the user searches `phone` and, before its response arrives, chooses the category `laptops`
+- **THEN** only the products of `laptops` are shown, even if the response for `phone` arrives later
 
 ### Requirement: Search and filter are accessible
 
