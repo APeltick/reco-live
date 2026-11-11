@@ -80,6 +80,9 @@ jobs:
           AI_KIT_CMD
           npm run lint
           } 2>&1 | tee "$RUNNER_TEMP/ai-kit-lint.log"
+      - name: unit
+        run: |
+          npm run test
       - name: "setup: openspec"
         # The CI machine has no OpenSpec CLI: it is installed only when the PR has openspec/ (a change).
         if: hashFiles('openspec/**') != ''
@@ -88,7 +91,7 @@ jobs:
       - name: openspec validate
         if: hashFiles('openspec/**') != ''
         run: |
-          openspec validate --all --strict
+          npx --yes @fission-ai/openspec@1.17.0 validate --all --strict
       - name: build
         run: |
           npm run build

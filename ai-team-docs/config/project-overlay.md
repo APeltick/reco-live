@@ -30,7 +30,7 @@
 | codegen | — | генерация кода (например клиент базы) |
 | typecheck | npm run typecheck | типы |
 | lint | npm run lint | линт |
-| unit | — | юниты без базы и process guard |
+| unit | npm run test | юниты без базы и process guard |
 | integration | — | integration: код сервера и настоящая база в процессе теста, без браузера и без запущенного local server (spec/05); с базой — тяжёлое |
 | build | npm run build | сборка; папка сборки — с суффиксом `.noindex` |
 | preview_start | npm run preview -- --host 127.0.0.1 --port {port} --strictPort | local preview server из сборки |
@@ -43,7 +43,7 @@
 | e2e_shards | 4 | на сколько частей резать full e2e lane в CI |
 | migrations_newer | — | проверка: миграция PR новее последней в integration branch |
 | migrations_schema | — | проверка: схема = миграции на пустой базе |
-| openspec_validate | openspec validate --all --strict | проверка спек |
+| openspec_validate | npx --yes @fission-ai/openspec@1.17.0 validate --all --strict | проверка спек |
 | process_guard | node .github/ai-team/process-guard.mjs | process guard AI kit для gate и prefilter (правила — раздел `process-guard`); CI зовёт файл `.github/ai-team/process-guard.mjs` сам, эту строку не читает |
 | screenshot | {playwright} screenshot --full-page --viewport-size=1280,800 {url} {file} | снимок экрана для `ai-team screenshots` (`{playwright}` — node_modules/.bin/playwright проекта, без npx; `{url}`, `{file}` подставляет AI kit) |
 | worktree_prep | — | необязательно: свой шаг для нового worktree (например, создать тестовую базу agent); `ai-team worktree-prep` запускает его в worktree с окружением agent из раздела `env` (spec/09 §1) |
