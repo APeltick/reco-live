@@ -1,0 +1,3 @@
+## 1. Pin OpenSpec (#55)
+
+- [ ] 1.1 [light] Add `@fission-ai/openspec` 1.17.0 (exact) to `devDependencies` with `npm install --save-dev --save-exact @fission-ai/openspec@1.17.0 --legacy-peer-deps`; add the npm script `"spec:validate": "openspec validate --all --strict"`; list `npm run spec:validate` in `docs/commands/README.md`; commit `package.json`, `package-lock.json`, the doc. Verify: `npm ci --legacy-peer-deps` passes; `npx --no-install openspec --version` → 1.17.0 (the global CLI may stay 1.10.0 — the project one wins); `npm run spec:validate` exits 0 on `main`; `npm run check` passes; `git diff --stat` — only these three files and `openspec/changes/55-openspec-pin/tasks.md`.
