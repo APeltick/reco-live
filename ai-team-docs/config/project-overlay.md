@@ -45,7 +45,7 @@
 | migrations_schema | — | проверка: схема = миграции на пустой базе |
 | openspec_validate | npx --yes @fission-ai/openspec@1.17.0 validate --all --strict | проверка спек |
 | process_guard | node .github/ai-team/process-guard.mjs | process guard AI kit для gate и prefilter (правила — раздел `process-guard`); CI зовёт файл `.github/ai-team/process-guard.mjs` сам, эту строку не читает |
-| screenshot | {playwright} screenshot --full-page --viewport-size=1280,800 {url} {file} | снимок экрана для `ai-team screenshots` (`{playwright}` — node_modules/.bin/playwright проекта, без npx; `{url}`, `{file}` подставляет AI kit) |
+| screenshot | {playwright} screenshot --full-page --viewport-size=1280,800 --wait-for-timeout=2000 {url} {file} | снимок экрана для `ai-team screenshots` (`{playwright}` — node_modules/.bin/playwright проекта, без npx; `{url}`, `{file}` подставляет AI kit) |
 | worktree_prep | — | необязательно: свой шаг для нового worktree (например, создать тестовую базу agent); `ai-team worktree-prep` запускает его в worktree с окружением agent из раздела `env` (spec/09 §1) |
 | ready | — | необязательно: проверка готовности worktree (например `npx tsc --noEmit`); упала — executor subagent не запускает |
 
