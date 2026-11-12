@@ -309,11 +309,28 @@ function checkTasksField(base, head, body) {
 }
 
 const PR_FIELDS = ["Tasks", "E2E", "Test layers", "Screenshots", "Proof", "Depends on", "Issue", "Models"];
+// The text of a field: its line; for «Proof:» also the lines under it — a fenced block or a list, up to the next field or a heading
+// (the proof is often the command output under the line; its lines are not fields or headings inside a fence).
+function fieldText(body, f) {
+  const lines = body.split("\n");
+  const at = lines.findIndex((l) => new RegExp(`^${f}:`).test(l));
+  if (at < 0) return null;
+  const text = [lines[at].replace(new RegExp(`^${f}:`), "")];
+  if (f !== "Proof") return text;
+  let fence = false;
+  for (const l of lines.slice(at + 1)) {
+    if (!fence && (PR_FIELDS.some((g) => new RegExp(`^${g}:`).test(l)) || /^#{1,6}\s/.test(l))) break;
+    if (/^\s*(```|~~~)/.test(l)) fence = !fence;
+    text.push(l);
+  }
+  return text;
+}
 function checkPrFields(body) {
   for (const f of PR_FIELDS) {
-    const m = new RegExp(`^${f}:[ \\t]*(.*)$`, "m").exec(body);
-    if (!m) fail("pr-fields", `no field «${f}:» in the PR description (PR template)`);
-    else if (!m[1].trim() || /<[^>]+>/.test(m[1])) fail("pr-fields", `the field «${f}:» is not filled in (— if there is nothing)`);
+    const text = fieldText(body, f);
+    if (text === null) fail("pr-fields", `no field «${f}:» in the PR description (PR template)`);
+    // A template hint: «<…>» in the line, or a line under «Proof:» that is only «<…>».
+    else if (!text.join("\n").trim() || /<[^>]+>/.test(text[0]) || text.slice(1).some((l) => /^\s*<[^>]+>\s*$/.test(l))) fail("pr-fields", `the field «${f}:» is not filled in (— if there is nothing)`);
   }
   // A section in either form: «## Conflicts» or the old Russian heading (compat, PR_SECTIONS).
   for (const h of PR_SECTIONS) if (!new RegExp(`^##\\s+${either(h)}`, "m").test(body)) fail("pr-fields", `no section «## ${h.en}» in the PR description`);

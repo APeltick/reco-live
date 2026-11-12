@@ -7,7 +7,7 @@ Tasks: <task numbers from tasks.md, for example 2.1, 2.2>
 E2E: <e2e files related to the work — gate and the executor run them before the PR>
 Test layers: <each new test file: path — layer (unit / integration / e2e); a new e2e — «why not lower: …», a new e2e file — also «why not a step: …»; or —>
 Screenshots: <screen routes or —>
-Proof: <what proves it: tests; a mutation check — the test turns red if the code is broken; bugfix — a red run before the fix and a green one after>
+Proof: <what proves it: tests; a mutation check — the test turns red if the code is broken; bugfix — a red run before the fix and a green one after. The command output: a fenced block right under this line, before «Depends on:»>
 Depends on: <#N of the parent PR or —>
 Issue: <link>
 Models: <tier→exact model ×N, for example standard→claude-sonnet-5-5 ×2>
