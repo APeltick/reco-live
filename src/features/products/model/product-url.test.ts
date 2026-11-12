@@ -98,6 +98,15 @@ describe("productsQueryToSearchParams", () => {
     expect(params.has("category")).toBe(false);
   });
 
+  it("padded search → trimmed q", () => {
+    const params = productsQueryToSearchParams({
+      kind: "search",
+      q: " phone ",
+    });
+
+    expect(params.get("q")).toBe("phone");
+  });
+
   it("category → category only (search cleared)", () => {
     const params = productsQueryToSearchParams({
       kind: "category",
