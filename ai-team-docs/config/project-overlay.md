@@ -48,6 +48,7 @@
 | screenshot | {playwright} screenshot --full-page --viewport-size=1280,800 --wait-for-timeout=2000 {url} {file} | снимок экрана для `ai-team screenshots` (`{playwright}` — node_modules/.bin/playwright проекта, без npx; `{url}`, `{file}` подставляет AI kit) |
 | worktree_prep | — | необязательно: свой шаг для нового worktree (например, создать тестовую базу agent); `ai-team worktree-prep` запускает его в worktree с окружением agent из раздела `env` (spec/09 §1) |
 | ready | — | необязательно: проверка готовности worktree (например `npx tsc --noEmit`); упала — executor subagent не запускает |
+| worktree_teardown | — | optional: the step before watch removes a worktree (for example, drop the worktree's own test database; DEC-0121) — in the worktree, with the executor's environment from `env` and `AI_TEAM_WORKTREE`, `AI_TEAM_BRANCH`; 5-minute limit; it fails — the worktree is kept and named. Must be safe to run twice; the agent's shared database (`AI_TEAM_DATABASE`) is not the worktree's |
 
 ## paths
 
@@ -210,6 +211,7 @@
 | review_rounds | 2 | how many failed reviews a PR may have with the human present; the next failed review is the review round limit: the PR does not go back to the executor, lead and the operator decide (spec/06 §5, DEC-0110); `0` — no limit |
 | review_rounds_away | 3 | the same in away (spec/06 §5, DEC-0110); `0` — no limit |
 | agent_silent_min | 30 | minutes without a change of the pane and the transcript of an executor with a current brief, then the silent hang class (spec/09 §2, DEC-0111); `0` — the class is disabled |
+| away_stop_pct | 0 | the weekly usage % at which an away stops the team: no new tasks, agents checkpoint and pause, no auto-resume (spec/11 §7, DEC-0115); `ai-team away --stop-at N` overrides it for one away; `0` — disabled |
 
 ## merge
 

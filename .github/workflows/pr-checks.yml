@@ -85,9 +85,14 @@ jobs:
           npm run test
       - name: "setup: openspec"
         # The CI machine has no OpenSpec CLI: it is installed only when the PR has openspec/ (a change).
+        # A project that pins @fission-ai/openspec uses that version from node_modules (its install step); only an unpinned one gets the global 1.x.
         if: hashFiles('openspec/**') != ''
         run: |
-          command -v openspec >/dev/null || npm install -g @fission-ai/openspec@1 --no-fund --no-audit
+          if node -e 'const p=require("./package.json");process.exit(p.dependencies?.["@fission-ai/openspec"]||p.devDependencies?.["@fission-ai/openspec"]?0:1)' && [ -x node_modules/.bin/openspec ]; then
+            echo "$PWD/node_modules/.bin" >> "$GITHUB_PATH"
+          else
+            command -v openspec >/dev/null || npm install -g @fission-ai/openspec@1 --no-fund --no-audit
+          fi
       - name: openspec validate
         if: hashFiles('openspec/**') != ''
         run: |
