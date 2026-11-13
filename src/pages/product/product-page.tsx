@@ -1,6 +1,4 @@
-import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import LinearProgress from "@mui/material/LinearProgress";
 import MenuItem from "@mui/material/MenuItem";
 import Pagination from "@mui/material/Pagination";
@@ -32,6 +30,7 @@ import {
   useFetchProducts,
 } from "~features/products";
 import { ROUTES_CONSTANTS } from "~shared/config/routes";
+import { ErrorAlert } from "~shared/ui/error-alert";
 
 const SEARCH_DEBOUNCE_MS = 300;
 const T_T_DEV = {
@@ -40,7 +39,6 @@ const T_T_DEV = {
   loading: "Loading products",
   pagination: "Pagination",
   noProducts: "No products found",
-  retry: "Try again",
   searchLabel: "Search products",
   loadError: "Could not load products.",
 } as const;
@@ -96,6 +94,7 @@ export function ProductPage() {
 
   const {
     collection,
+    error,
     isError,
     isFetching,
     refetch,
@@ -167,16 +166,11 @@ export function ProductPage() {
         />
       )}
       {isError && (
-        <Alert
-          action={(
-            <Button color="inherit" onClick={refetch} size="small">
-              {T_T_DEV.retry}
-            </Button>
-          )}
-          severity="error"
-        >
-          {T_T_DEV.loadError}
-        </Alert>
+        <ErrorAlert
+          error={error}
+          genericText={T_T_DEV.loadError}
+          onRetry={refetch}
+        />
       )}
       <Box ref={listReference}>
         <Typography
