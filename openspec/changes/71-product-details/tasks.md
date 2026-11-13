@@ -19,7 +19,7 @@
 
 ## 2. Page and links (#71)
 
-- [ ] 2.1 [standard] The route, the page and the pending indicators per the spec and `design.md`:
+- [x] 2.1 [standard] The route, the page and the pending indicators per the spec and `design.md`:
   - a route constant in `routes.constants.ts`;
   - in `router.tsx`, the `/products/:id` route: a thin loader over `resolveProductDetails` (throws a 404 route response for `not-found`, returns the result otherwise), `HydrateFallback: ContainerLoader`, and the page loaded lazily like `/product`;
   - the page `src/pages/product-details/`: image (`images[0]` → `thumbnail`, alt = title), `h1` title, price `$x.xx` (`Intl.NumberFormat` en-US USD), description; `Back to products` built from `location.state.from`; `ContainerLoader` while `useRevalidator().state === "loading"`; for an `error` result, an `Alert` `Could not load the product.` with `Try again` → `useRevalidator().revalidate()`;
