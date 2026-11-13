@@ -28,7 +28,7 @@ The list SHALL show the current result in pages of 10 products: page `p` SHALL b
 
 ### Requirement: Page number in the URL
 
-The current page SHALL be kept in the query parameter `page`, counted from 1, next to `q` or `category`. Page 1 SHALL NOT be written to the URL. Opening a URL with `page=<n>` SHALL show page n of that search, category or full list, with the controls marking it. Each page change SHALL add a browser history entry, so Back restores the previous page. A change of search or category SHALL remove `page`, so the new result starts at page 1. After a page change the view SHALL scroll to the top of the list.
+The current page SHALL be kept in the query parameter `page`, counted from 1, next to `q` or `category`. Page 1 SHALL NOT be written to the URL. Opening a URL with `page=<n>` SHALL show page n of that search, category or full list, with the controls marking it.
 
 #### Scenario: Link with a page
 
@@ -39,6 +39,10 @@ The current page SHALL be kept in the query parameter `page`, counted from 1, ne
 
 - **WHEN** the user is on `/product?page=3` and chooses page 1 in the controls
 - **THEN** the URL becomes `/product` and the first page is shown
+
+### Requirement: Page changes and history
+
+Each page change SHALL add a browser history entry, so Back restores the previous page. A change of search or category SHALL remove `page`, so the new result starts at page 1. After a page change the view SHALL scroll to the top of the list.
 
 #### Scenario: Back restores the previous page
 
