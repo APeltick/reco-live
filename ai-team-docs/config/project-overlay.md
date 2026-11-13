@@ -32,7 +32,7 @@
 | lint | npm run lint | линт |
 | unit | npm run test | юниты без базы и process guard |
 | integration | — | integration: код сервера и настоящая база в процессе теста, без браузера и без запущенного local server (spec/05); с базой — тяжёлое |
-| build | npm run build | сборка; папка сборки — с суффиксом `.noindex` |
+| build | VITE_APP_API_URL=https://dummyjson.com npm run build | сборка; папка сборки — с суффиксом `.noindex`; публичный адрес DummyJSON (не секрет): Vite вшивает его при сборке, без него сборки gate и integration preview показывают только ошибку каталога (OI-1486, #74) |
 | preview_start | npm run preview -- --host 127.0.0.1 --port {port} --strictPort | local preview server из сборки |
 | dev_start | npm run dev -- --host 127.0.0.1 --port {port} --strictPort | local dev server |
 | health_path | / | путь health check |
