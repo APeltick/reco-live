@@ -8,13 +8,15 @@ import type { FetchState } from "~shared/lib/hooks";
 
 import {
   useCallback,
-  useRef,
+  useEffect,
+  useState,
 } from "react";
 import {
   useDispatch,
   useSelector,
 } from "react-redux";
 import { useFetch } from "~shared/lib/hooks";
+import { createLatestRequest } from "~shared/lib/latest-request";
 
 import { getProducts } from "../api/get-products";
 import {
@@ -44,15 +46,16 @@ export function useFetchProducts(
   const { limit, skip } = paging;
   const queryKind = query.kind;
   const queryValue = getQueryValue(query);
-  const controllerReference = useRef<AbortController | null>(null);
+  // One instance per hook: it outlives re-renders, so the cleanup below runs on unmount only.
+  const [latestRequest] = useState(createLatestRequest);
+
+  useEffect(() => () => {
+    latestRequest.abort();
+  }, [latestRequest]);
 
   const fetchProducts = useCallback(async () => {
     // Latest request wins: a new run aborts the previous one.
-    controllerReference.current?.abort();
-    const controller = new AbortController();
-
-    controllerReference.current = controller;
-    const { signal } = controller;
+    const signal = latestRequest.next();
 
     const currentQuery = toQuery(queryKind, queryValue);
     const receivedProducts = await getProducts(
@@ -72,7 +75,7 @@ export function useFetchProducts(
     dispatch(productsReceived(receivedProducts));
 
     return receivedProducts;
-  }, [dispatch, limit, queryKind, queryValue, skip]);
+  }, [dispatch, latestRequest, limit, queryKind, queryValue, skip]);
 
   const fetchState = useFetch(fetchProducts);
 
