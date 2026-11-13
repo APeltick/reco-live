@@ -37,10 +37,10 @@
 | dev_start | npm run dev -- --host 127.0.0.1 --port {port} --strictPort | local dev server |
 | health_path | / | путь health check |
 | memory_limit_mb | 4096 | лимит памяти local server |
-| e2e | — | e2e (файлы спек дописывает AI kit); число воркеров передаёт AI kit: Playwright — `--workers=N`, другие — `{workers}` в команде |
-| e2e_smoke | — | короткий набор: главные экраны и вход |
-| e2e_setup | — | подготовка e2e в CI (браузеры) |
-| e2e_shards | 4 | на сколько частей резать full e2e lane в CI |
+| e2e | npx playwright test | e2e (файлы спек дописывает AI kit); число воркеров передаёт AI kit: Playwright — `--workers=N`, другие — `{workers}` в команде |
+| e2e_smoke | npx playwright test --grep @smoke | короткий набор: главные экраны и вход |
+| e2e_setup | npx playwright install --with-deps chromium | подготовка e2e в CI (браузеры) |
+| e2e_shards | 1 | на сколько частей резать full e2e lane в CI |
 | migrations_newer | — | проверка: миграция PR новее последней в integration branch |
 | migrations_schema | — | проверка: схема = миграции на пустой базе |
 | openspec_validate | npx --yes @fission-ai/openspec@1.17.0 validate --all --strict | проверка спек |
