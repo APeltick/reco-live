@@ -33,17 +33,25 @@ export interface RequestParams {
 
 interface RequestErrorOptions {
   cause?: unknown;
+  isNetworkError?: boolean;
   response?: Response;
 }
 
 export class RequestError extends Error {
+  readonly isNetworkError: boolean;
   readonly response: Response | undefined;
 
   constructor(message: string, options: RequestErrorOptions = {}) {
     super(message, { cause: options.cause });
     this.name = "RequestError";
+    this.isNetworkError = options.isNetworkError ?? false;
     this.response = options.response;
   }
+}
+
+/** True when the request got no response at all (fetch rejected, not aborted). */
+export function isNetworkError(error: unknown): boolean {
+  return error instanceof RequestError && error.isNetworkError;
 }
 
 export async function request(
@@ -95,7 +103,10 @@ export async function request(
       pathname: requestUrl.pathname,
     });
 
-    throw new RequestError("Network request failed.", { cause: error_ });
+    throw new RequestError("Network request failed.", {
+      cause: error_,
+      isNetworkError: true,
+    });
   }
 
   const isAllowedError = allowedStatusCodes?.includes(response.status) === true;
