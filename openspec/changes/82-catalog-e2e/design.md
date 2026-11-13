@@ -1,0 +1,26 @@
+## Context
+
+Change 94 gives `playwright.config.ts`, `tests/e2e/fixtures/mock-dummy-json.ts` (`mockDummyJson(page, overrides?)`: `https://dummyjson.com/**` answered from JSON — `/products`, `/products/categories`, `/products/<id>`, anything else aborted; `https://cdn.dummyjson.com/**` answered with one SVG) and one `@smoke` test. The app calls `GET /products?limit=10&skip=<n>`, `/products/search?q=<text>&limit=10&skip=<n>`, `/products/category/<slug>?limit=10&skip=<n>`, `/products/categories` and `/products/<id>` (`src/features/products/api/product-api.constants.ts`). Review of #102: other hosts go to the live network; an aborted request is silent unless the UI asserts on it.
+
+## Goals / Non-Goals
+
+Goals: browser proof of the catalog scenarios whose wiring the units cannot catch; a stub that cannot reach the network and reports any request it did not expect.
+
+Non-goals: new product behaviour; error and offline scenarios (covered by units and integration tests of `useFetch` and `ErrorAlert`; can be added later as steps); other browsers (OI-1932); the product page beyond the smoke (change 71 flow is the smoke itself).
+
+## Decisions
+
+- **Stub routing by path and query.** `mockDummyJson` keeps its signature and defaults (the smoke does not change its data) and adds named fixtures: list pages by `skip` (`skip=0` — today's `products.json`, `skip=10` — a second page with other titles), search by `q` (`phone` — a few smartphones, `mac` — a few laptops; an unknown `q` → `{ products: [], total: 0, skip: 0, limit: 10 }`), category by slug (`laptops`, `smartphones`; unknown → the empty result). `limit` must be `10`, otherwise unmatched. Fixtures stay JSON files in `tests/e2e/fixtures/` (shape of DummyJSON, `total` consistent with the page).
+- **Request log.** The helper returns a handle; `handle.requests` lists the API requests in order as `path + search` (no host), so a test asserts "exactly one `GET /products/search?q=phone&limit=10&skip=0`" without timing.
+- **Holding a response.** `handle.hold(match)` (match = a path+query string or a predicate) returns `{ arrived: Promise<void>, release(): Promise<void> }`: the matching request is parked until `release()`; `arrived` resolves when the browser sent it. A released request whose page already aborted it is ignored (Playwright throws on fulfilling an aborted route — the helper swallows only that error). This is how latest-wins and leave-and-come-back are made deterministic — no `waitForTimeout`.
+- **Strict origin guard.** A catch-all `page.route("**/*")` registered first (later routes win in Playwright) lets through only the base URL origin (`new URL(baseURL).origin`, from the test's `baseURL`), and DummyJSON/CDN go to their handlers; everything else is aborted and recorded. Unmatched DummyJSON requests are recorded too. A Playwright fixture (`test.extend`, e.g. `tests/e2e/fixtures/test.ts` exporting `test` and `expect`) wires `mockDummyJson` and, after each test, asserts the record is empty (message lists the URLs). Both spec files import `test` from there.
+- **Smoke.** Keeps its path (OI-1942) and adds one check: `Category` (open the select) offers `All categories` and the stubbed category names, then closes it — so a broken categories stub fails the smoke.
+- **One catalog file, scenario per test.** `tests/e2e/catalog.spec.ts`, each test independent (own `page.goto`), steps by `test.step`, locators by role and label (`getByRole("combobox", { name: "Category" })`, `getByLabel("Search products")`, `getByRole("status")`, `getByRole("navigation", { name: "Pagination" })`). Why a new file and not steps of the smoke: different user goals (search, filter, history, races); the smoke must stay one short main path.
+- **Why e2e and not lower.** The units prove the helpers; what breaks unnoticed is the page wiring: the debounce skip rule against the URL, `setSearchParams` history entries and Back, MUI select by keyboard, the abort of a request across route unmount. Each test names its mutation (below in `tasks.md`) that must turn it red.
+- **e2e-map (team rules).** After the tests are on main: `src/pages/product/**` → `tests/e2e/catalog.spec.ts`, `src/features/products/**` → `tests/e2e/catalog.spec.ts`, `tests/e2e/fixtures/**` → `tests/e2e/**/*.spec.ts`. Not earlier: a map row pointing at a missing file would break the targeted lane.
+
+## Risks / Trade-offs
+
+- [Held route and abort] When the page aborts a parked request, `route.fulfill` throws; the helper must swallow only that case, or tests fail on teardown. The guard's after-test check must not count those requests as unmatched.
+- [Base URL origin] The guard takes the origin from the test's `baseURL` (gate passes `PLAYWRIGHT_BASE_URL`); a dev tool calling another local origin would be aborted and reported — intended.
+- [Fixture drift] Fixtures are hand-written, not live DummyJSON; the tests check the app's wiring, not DummyJSON's matching. The contract with the live API stays with the units' fixtures and manual Proof.
