@@ -11,7 +11,7 @@
 | `engines.node` | Limits supported Node.js releases to the project's tested range. |
 | `scripts` | Defines the repeatable development, validation, build, preview, and audit commands. See [all commands](../commands/README.md). |
 | `dependencies` | Runtime packages shipped with the application: React, React DOM, Material UI with Emotion, Redux, routing, and validation. |
-| `devDependencies` | Local development and build tooling: Vite, TypeScript, ESLint and its plugins, Stylelint, type declarations, and the React Vite plugin. |
+| `devDependencies` | Local development and build tooling: Vite, TypeScript, ESLint and its plugins, Stylelint, type declarations, the React Vite plugin, and the pinned OpenSpec CLI (`npm run spec:validate`). |
 | `browserslist` | The browser baseline consumed by `eslint-plugin-compat` and reflected in Vite's production target. |
 
 ## Dependency policy
