@@ -3,6 +3,8 @@ import {
   useRef,
 } from "react";
 
+import { scheduleDebounced } from "./schedule-debounced";
+
 /**
  * Calls `callback(value)` after `delayMs` without a change of `value`.
  * `isSkipped(value)` true → nothing is scheduled (and a pending call is cancelled).
@@ -22,21 +24,11 @@ export function useDebouncedValue<Value>(
   });
 
   useEffect(() => {
-    if (skipCheckReference.current(value)) {
-      return;
-    }
-
-    const timer = setTimeout(() => {
-      // re-check against the latest state: the URL may have changed during the pause
-      if (skipCheckReference.current(value)) {
-        return;
-      }
-
-      callbackReference.current(value);
-    }, delayMs);
-
-    return () => {
-      clearTimeout(timer);
-    };
+    return scheduleDebounced(
+      value,
+      delayMs,
+      (v) => skipCheckReference.current(v),
+      (v) => { callbackReference.current(v); },
+    );
   }, [value, delayMs]);
 }
