@@ -170,6 +170,11 @@ A response for an older search, category or page SHALL NOT replace the result of
 - **WHEN** the user chooses page 2 and, before its response arrives, chooses page 3
 - **THEN** only the products of page 3 are shown with page 3 marked, even if the response for page 2 arrives later
 
+#### Scenario: Leaving the catalog and coming back
+
+- **WHEN** the user searches `phone`, leaves `/product` (for example, opens a product) before its response arrives, and comes back to `/product?category=laptops`
+- **THEN** only the products of `laptops` are shown, even if the response for `phone` arrives later
+
 ### Requirement: Search and filter are accessible
 
 The search field and the category select SHALL have visible labels bound to the controls and SHALL be fully usable with the keyboard (focus by Tab, type, open and choose a category with the keyboard). The total and the empty or error message SHALL be announced to screen readers when they change (a polite live region for the total and empty result; the error as an alert).
