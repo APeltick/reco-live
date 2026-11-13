@@ -1,6 +1,6 @@
 ## 1. Data and rules (#71)
 
-- [ ] 1.1 [standard] Data and the decision rule per `design.md`, all exported through the feature index:
+- [x] 1.1 [standard] Data and the decision rule per `design.md`, all exported through the feature index:
   - `getProductById(id, signal): Promise<Product | null>` in `src/features/products/api/`: `PRODUCT_URLS.productById`, `request()` with `allowedStatusCodes: [404]` (`404` → `null`, not reported), `200` parsed with `ProductSchema` (wrong shape → `RequestError`).
   - In `src/features/products/model/`: `parseProductId(param) → number | null` (digits only, no leading zero, ≥ 1, ≤ `Number.MAX_SAFE_INTEGER`); the back-link builder (`from` → `/product` + `from` when it is a string that is empty or starts with `?`, otherwise `/product`); `resolveProductDetails(idParam, getById, signal)` → `{ kind: "not-found" }` | `{ kind: "product", product }` | `{ kind: "error", error }` (rejected id → `not-found` without calling `getById`; `null` → `not-found`; a thrown `RequestError` → `error`; anything else rethrown).
 
