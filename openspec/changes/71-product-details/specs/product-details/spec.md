@@ -65,9 +65,9 @@ When the `id` in the URL is not a positive integer, the app SHALL show the exist
 - **WHEN** the user opens `/products/9999` and the API answers `404`
 - **THEN** the not-found page is shown
 
-### Requirement: Loading and error states of the product page
+### Requirement: Loading indicator on the product page
 
-While the product loads, the app SHALL show a loading indicator inside the main layout: on a direct open of the page, on a navigation to it from inside the app (the previous page may stay visible under the indicator), and on every retry. Any other failed request (no response, a non-2xx status other than 404, or a response of the wrong shape) SHALL show, inside the main layout, an MUI error alert with the text `Could not load the product.` (no technical details) and a `Try again` button that repeats the same request without reloading the app. The error SHALL be announced to screen readers as an alert.
+While the product loads, the app SHALL show a loading indicator inside the main layout: on a direct open of the page, on a navigation to it from inside the app (the previous page may stay visible under the indicator), and on every retry.
 
 #### Scenario: Loading on a direct open
 
@@ -78,6 +78,10 @@ While the product loads, the app SHALL show a loading indicator inside the main 
 
 - **WHEN** the user clicks a product title in the catalog and the product response has not arrived yet
 - **THEN** a loading indicator is shown until the details page replaces the catalog
+
+### Requirement: Error state of the product page
+
+A failed product request other than a `404` answer (no response, another non-2xx status, or a response of the wrong shape) SHALL show, inside the main layout, an MUI error alert with the text `Could not load the product.` (no technical details) and a `Try again` button that repeats the same request without reloading the app. The error SHALL be announced to screen readers as an alert.
 
 #### Scenario: Request fails
 
