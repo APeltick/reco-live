@@ -18,7 +18,7 @@ When the network is down, the catalog shows the same `Could not load products.` 
 ### Modified Capabilities
 
 - `product-catalog` (change `22-dummyjson-catalog`): "Empty and error messages" splits out the network error.
-- `product-details` (change `71-product-details`): "Loading and error states of the product page" splits out the network error.
+- `product-details` (change `71-product-details`): "Error state of the product page" splits out the network error.
 
 This change is archived after `22-dummyjson-catalog` and `71-product-details`.
 
