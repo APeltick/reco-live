@@ -1,3 +1,4 @@
+export { getProductById } from "./get-product-by-id";
 export {
   createCategoriesUrl,
   createProductsUrl,

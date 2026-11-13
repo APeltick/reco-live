@@ -1,4 +1,5 @@
 import Alert from "@mui/material/Alert";
+import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import LinearProgress from "@mui/material/LinearProgress";
 import MenuItem from "@mui/material/MenuItem";
@@ -9,7 +10,11 @@ import {
   useEffect,
   useState,
 } from "react";
-import { useSearchParams } from "react-router";
+import {
+  Link as RouterLink,
+  useLocation,
+  useSearchParams,
+} from "react-router";
 import {
   type Categories,
   getCategories,
@@ -34,6 +39,7 @@ const T_T_DEV = {
 
 export function ProductPage() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
   const { hasConflict, query } = parseProductsSearchParams(searchParams);
   const urlSearchText = getQuerySearchText(query);
   const categorySlug = getQueryCategorySlug(query);
@@ -157,7 +163,16 @@ export function ProductPage() {
           : `${String(collection.total)} products found`)}
       </Typography>
       {!isError && collection?.products.map((product) => (
-        <p key={product.id}>{product.title}</p>
+        <p key={product.id}>
+          <Box
+            component={RouterLink}
+            state={{ from: location.search }}
+            sx={{ color: "primary.main" }}
+            to={`/products/${String(product.id)}`}
+          >
+            {product.title}
+          </Box>
+        </p>
       ))}
     </Stack>
   );

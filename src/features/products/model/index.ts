@@ -1,3 +1,5 @@
+export { parseProductId } from "./parse-product-id";
+export { createProductBackLink } from "./product-back-link";
 export {
   productReducer,
   productsReceived,
@@ -13,6 +15,7 @@ export {
   SEARCH_PARAM,
 } from "./product-url";
 export type { ParsedProductsParams } from "./product-url";
+export { formatUsdPrice, getProductPhoto } from "./product-view";
 export {
   CategoriesSchema,
   CategorySchema,
@@ -27,5 +30,9 @@ export type {
   ProductsPaging,
   ProductsQuery,
 } from "./product.types";
+export {
+  type ProductDetailsResult,
+  resolveProductDetails,
+} from "./resolve-product-details";
 export { useDebouncedValue } from "./use-debounced-value";
 export { useFetchProducts } from "./use-fetch-products";

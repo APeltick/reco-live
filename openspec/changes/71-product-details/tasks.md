@@ -1,6 +1,6 @@
 ## 1. Data and rules (#71)
 
-- [ ] 1.1 [standard] Data and the decision rule per `design.md`, all exported through the feature index:
+- [x] 1.1 [standard] Data and the decision rule per `design.md`, all exported through the feature index:
   - `getProductById(id, signal): Promise<Product | null>` in `src/features/products/api/`: `PRODUCT_URLS.productById`, `request()` with `allowedStatusCodes: [404]` (`404` → `null`, not reported), `200` parsed with `ProductSchema` (wrong shape → `RequestError`).
   - In `src/features/products/model/`: `parseProductId(param) → number | null` (digits only, no leading zero, ≥ 1, ≤ `Number.MAX_SAFE_INTEGER`); the back-link builder (`from` → `/product` + `from` when it is a string that is empty or starts with `?`, otherwise `/product`); `resolveProductDetails(idParam, getById, signal)` → `{ kind: "not-found" }` | `{ kind: "product", product }` | `{ kind: "error", error }` (rejected id → `not-found` without calling `getById`; `null` → `not-found`; a thrown `RequestError` → `error`; anything else rethrown).
 
@@ -19,7 +19,7 @@
 
 ## 2. Page and links (#71)
 
-- [ ] 2.1 [standard] The route, the page and the pending indicators per the spec and `design.md`:
+- [x] 2.1 [standard] The route, the page and the pending indicators per the spec and `design.md`:
   - a route constant in `routes.constants.ts`;
   - in `router.tsx`, the `/products/:id` route: a thin loader over `resolveProductDetails` (throws a 404 route response for `not-found`, returns the result otherwise), `HydrateFallback: ContainerLoader`, and the page loaded lazily like `/product`;
   - the page `src/pages/product-details/`: image (`images[0]` → `thumbnail`, alt = title), `h1` title, price `$x.xx` (`Intl.NumberFormat` en-US USD), description; `Back to products` built from `location.state.from`; `ContainerLoader` while `useRevalidator().state === "loading"`; for an `error` result, an `Alert` `Could not load the product.` with `Try again` → `useRevalidator().revalidate()`;
