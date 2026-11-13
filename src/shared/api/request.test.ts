@@ -205,3 +205,92 @@ describe("request", () => {
     expect(fetchedUrl()).toBe("https://other.example.org/path?q=1");
   });
 });
+
+describe("request domain override", () => {
+  it.each([
+    ["without a trailing slash", "https://other.example.org/api"],
+    ["with a trailing slash", "https://other.example.org/api/"],
+  ])("sends the request to the domain %s instead of the API URL", async (_name, domain) => {
+    await request({
+      domain,
+      url: "/items",
+    });
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchedUrl()).toBe("https://other.example.org/api/items");
+    expect(fetchedUrl()).not.toContain("api.example.com");
+  });
+
+  it("uses the domain even when the API URL is not configured", async () => {
+    vi.stubEnv("VITE_APP_API_URL", "");
+
+    await request({
+      domain: "https://other.example.org/api",
+      url: "items",
+    });
+
+    expect(fetchedUrl()).toBe("https://other.example.org/api/items");
+  });
+});
+
+describe("request when the error report fails", () => {
+  beforeEach(() => {
+    vi.mocked(sendErrorReport).mockImplementation(() => {
+      throw new Error("report transport failed");
+    });
+  });
+
+  it("still throws the original RequestError on a network failure", async () => {
+    const cause = new TypeError("fetch failed");
+    fetchMock.mockRejectedValue(cause);
+
+    const error = await catchError(request({ url: "/items" }));
+
+    expect(sendErrorReport).toHaveBeenCalledTimes(1);
+    expect(error).toBeInstanceOf(RequestError);
+    expect((error as RequestError).message).toBe("Network request failed.");
+    expect((error as RequestError).cause).toBe(cause);
+    expect((error as RequestError).response).toBeUndefined();
+  });
+
+  it("still throws the original RequestError with the response on a non-2xx status", async () => {
+    const response = new Response("nope", { status: 500 });
+    fetchMock.mockResolvedValue(response);
+
+    const error = await catchError(request({ url: "/items" }));
+
+    expect(sendErrorReport).toHaveBeenCalledTimes(1);
+    expect(error).toBeInstanceOf(RequestError);
+    expect((error as RequestError).message).toBe(
+      "Request failed with status 500.",
+    );
+    expect((error as RequestError).response).toBe(response);
+    expect((error as RequestError).cause).toBeUndefined();
+  });
+});
+
+describe("request with a body that cannot be serialized", () => {
+  const circular: Record<string, unknown> = {};
+  circular["self"] = circular;
+
+  it.each([
+    ["a BigInt value", { amount: 1n }],
+    ["a circular object", circular],
+  ])("throws RequestError with a cause and does not call fetch for %s", async (_name, body) => {
+    const error = await catchError(
+      request({
+        body,
+        method: "POST",
+        url: "/items",
+      }),
+    );
+
+    expect(error).toBeInstanceOf(RequestError);
+    expect((error as RequestError).message).toBe(
+      "Request body cannot be serialized as JSON.",
+    );
+    expect((error as RequestError).cause).toBeInstanceOf(TypeError);
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(sendErrorReport).not.toHaveBeenCalled();
+  });
+});

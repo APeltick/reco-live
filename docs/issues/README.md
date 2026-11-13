@@ -129,7 +129,7 @@ npm run audit                                     # expected: exit code 0 (produ
 Limitations and actions that must not be taken:
 
 - Do not run `npm audit fix --force`: it installs other, older majors (`eslint` 10.6.0 to 9.39.5 with `@eslint/js`, `eslint-plugin-sonarjs` 4.2.0 to 2.0.0, `eslint-plugin-unicorn` 72.0.0 to 65.0.1) and an older `typescript-eslint` within its major (8.62.0 to 8.36.0). This breaks the current ESLint configuration and leaves the exact version pins.
-- Do not add `overrides` that force `minimatch` to 11 (team decision OI-413: this entry is documentation only). The installed lint packages declare ranges that exclude 11.x, so forcing it breaks their dependency contract.
+- Do not add `overrides` that force `minimatch` to 11 (team decision OI-413: this entry is documentation only). Every installed `minimatch` consumer except `eslint-plugin-import-x` declares a range that excludes 11.x (`eslint`, `@eslint/config-array`, `eslint-plugin-sonarjs`, the `@typescript-eslint/typescript-estree` copies, and `eslint-plugin-jsx-a11y` on `minimatch@3.1.5`), so forcing it breaks their dependency contract.
 - Do not pick a lint package version from the `npm audit` output. Choose versions only after checking their declared `minimatch` range and release notes.
 - Do not add an ignore tool (`audit-ci`, `better-npm-audit` or similar) only to silence this advisory.
 - Do not switch the `audit` script to a full `npm audit` without a decision from the team, because the pre-push gate would then fail on a dev-only issue with no non-breaking fix for the reported packages.
