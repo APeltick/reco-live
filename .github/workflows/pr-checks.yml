@@ -99,7 +99,7 @@ jobs:
           npx --yes @fission-ai/openspec@1.17.0 validate --all --strict
       - name: build
         run: |
-          npm run build
+          VITE_APP_API_URL=https://dummyjson.com npm run build
       - name: ci-baseline — warnings and time against the base
         # Warnings of lint and typecheck against .github/ai-team/ci-baseline.json of the base commit (a PR does not loosen its own threshold):
         # more by over 10 % and by at least 1 — red, the PR's fault; the time — only a warning: shared CI machines jump by ±20 % (DEC-0112).
