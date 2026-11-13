@@ -1,6 +1,4 @@
-import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import {
@@ -16,11 +14,11 @@ import {
   type ProductDetailsResult,
 } from "~features/products";
 import { ContainerLoader } from "~shared/ui/container-loader";
+import { ErrorAlert } from "~shared/ui/error-alert";
 
 const T_T_DEV = {
   back: "Back to products",
   loadError: "Could not load the product.",
-  retry: "Try again",
 } as const;
 
 export function ProductDetailsPage() {
@@ -46,22 +44,13 @@ export function ProductDetailsPage() {
         {T_T_DEV.back}
       </Box>
       {result.kind === "error" && (
-        <Alert
-          action={(
-            <Button
-              color="inherit"
-              onClick={() => {
-                void revalidator.revalidate();
-              }}
-              size="small"
-            >
-              {T_T_DEV.retry}
-            </Button>
-          )}
-          severity="error"
-        >
-          {T_T_DEV.loadError}
-        </Alert>
+        <ErrorAlert
+          error={result.error}
+          genericText={T_T_DEV.loadError}
+          onRetry={() => {
+            void revalidator.revalidate();
+          }}
+        />
       )}
       {result.kind === "product" && (
         <Stack spacing={2}>
