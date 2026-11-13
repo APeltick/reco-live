@@ -32,7 +32,7 @@ So "no `response`" alone is not a safe sign of a network error, because the miss
   - catalog: `refetch` of the same request;
   - product page: `revalidate()` (change 71).
 - **One shared piece for the alert.** The MUI `Alert severity="error"` with the message and the `Try again` button is used on both pages. The text depends on `isNetworkError(error)`; otherwise it is the page's own generic text. It goes in `src/shared/ui/` (it knows nothing about products), or in the products feature if the executor finds it fits better; the choice is named in the PR. The alert keeps `role="alert"`, so screen readers announce it.
-- **The product page** (from 71) already gets a non-404 failure as a returned error result from its loader. It passes that error to the same piece. The 404 path stays a thrown 404 route response, so the not-found page is unchanged.
+- **The product page** (from 71) already gets a non-404 failure as the `{ kind: "error", error }` result of `resolveProductDetails`, returned by its loader. It passes that error to the same piece. The 404 path stays a thrown 404 route response, so the not-found page is unchanged.
 - **Tests:**
   - unit in `request.test.ts`: a rejected `fetch` gives `isNetworkError === true`; a 500, a missing API URL and an abort give `false` (an abort is rethrown, not wrapped);
   - `isNetworkError` on a non-`RequestError` gives `false`;
