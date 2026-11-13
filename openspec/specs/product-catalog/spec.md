@@ -120,7 +120,7 @@ If both `q` and `category` are present in an opened URL, `category` SHALL win an
 
 ### Requirement: Empty and error messages
 
-A result with no products SHALL show `No products found` (and no list). A failed request (network, non-2xx, or a response of the wrong shape) SHALL show an MUI error alert with the text `Could not load products.` (no technical details) and a `Try again` button that repeats the same request.
+A result with no products SHALL show `No products found` (and no list). A failed request SHALL show an MUI error alert, with no technical details, and a `Try again` button that repeats the same request. When the request got no response at all, the alert text SHALL be `No connection to the server. Check your internet connection and try again.` For any other failure the alert text SHALL be `Could not load products.` A cancelled request (replaced by a newer one) SHALL NOT show an error.
 
 #### Scenario: Empty result
 
@@ -129,8 +129,18 @@ A result with no products SHALL show `No products found` (and no list). A failed
 
 #### Scenario: Request fails
 
-- **WHEN** the products request fails
+- **WHEN** the products request fails with status 500 (or another non-2xx status, or a response of the wrong shape)
 - **THEN** an error alert `Could not load products.` with `Try again` is shown; pressing it sends the same request again
+
+#### Scenario: No connection
+
+- **WHEN** the products request gets no response because the network is unavailable (offline, DNS failure, unreachable host, or a request blocked before a response)
+- **THEN** an error alert `No connection to the server. Check your internet connection and try again.` with `Try again` is shown
+
+#### Scenario: Retry after the connection is back
+
+- **WHEN** the network error is shown, the network is available again and the user presses `Try again`
+- **THEN** the same request is sent again and its result replaces the error
 
 ### Requirement: Loading indicator
 

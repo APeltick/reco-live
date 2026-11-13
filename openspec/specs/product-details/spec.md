@@ -86,12 +86,17 @@ While the product loads, the app SHALL show a loading indicator inside the main 
 
 ### Requirement: Error state of the product page
 
-A failed product request other than a `404` answer (no response, another non-2xx status, or a response of the wrong shape) SHALL show, inside the main layout, an MUI error alert with the text `Could not load the product.` (no technical details) and a `Try again` button that repeats the same request without reloading the app. The error SHALL be announced to screen readers as an alert.
+A failed product request other than a `404` answer SHALL show, inside the main layout, an MUI error alert with no technical details and a `Try again` button that repeats the same request without reloading the app. When the request got no response at all, the alert text SHALL be `No connection to the server. Check your internet connection and try again.` For any other failure the alert text SHALL be `Could not load the product.` The error SHALL be announced to screen readers as an alert.
 
 #### Scenario: Request fails
 
-- **WHEN** the product request fails with status 500
+- **WHEN** the product request fails with status 500 (or another non-2xx status, or a response of the wrong shape)
 - **THEN** the page shows `Could not load the product.` and a `Try again` button inside the main layout
+
+#### Scenario: No connection
+
+- **WHEN** the product request gets no response because the network is unavailable (offline, DNS failure, unreachable host, or a request blocked before a response)
+- **THEN** the page shows `No connection to the server. Check your internet connection and try again.` and a `Try again` button inside the main layout
 
 #### Scenario: User retries
 
