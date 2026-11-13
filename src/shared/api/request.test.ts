@@ -1,7 +1,9 @@
 import {
   afterEach, beforeEach, describe, expect, it, vi,
 } from "vitest";
-import { request, RequestError } from "~shared/api/request";
+import {
+  isNetworkError, request, RequestError,
+} from "~shared/api/request";
 import { sendErrorReport } from "~shared/lib/error-report";
 
 vi.mock("~shared/lib/error-report");
@@ -107,6 +109,8 @@ describe("request", () => {
     expect(error).toBeInstanceOf(RequestError);
     expect((error as RequestError).message).toBe("Network request failed.");
     expect((error as RequestError).cause).toBe(cause);
+    expect((error as RequestError).isNetworkError).toBe(true);
+    expect(isNetworkError(error)).toBe(true);
     expect(sendErrorReport).toHaveBeenCalledTimes(1);
     expect(sendErrorReport).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -131,6 +135,8 @@ describe("request", () => {
     );
 
     expect(error).toBe(abortError);
+    expect(error).not.toBeInstanceOf(RequestError);
+    expect(isNetworkError(error)).toBe(false);
     expect(sendErrorReport).not.toHaveBeenCalled();
   });
 
@@ -145,6 +151,8 @@ describe("request", () => {
 
     expect(error).toBeInstanceOf(RequestError);
     expect((error as RequestError).response).toBe(response);
+    expect((error as RequestError).isNetworkError).toBe(false);
+    expect(isNetworkError(error)).toBe(false);
     expect(sendErrorReport).toHaveBeenCalledTimes(1);
     expect(sendErrorReport).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -193,9 +201,16 @@ describe("request", () => {
       expect((error as RequestError).message).toBe(
         "API URL is not configured.",
       );
+      expect((error as RequestError).isNetworkError).toBe(false);
       expect(fetchMock).not.toHaveBeenCalled();
     },
   );
+
+  it("isNetworkError is false for a plain Error and non-errors", () => {
+    expect(isNetworkError(new Error("plain"))).toBe(false);
+    expect(isNetworkError("fetch failed")).toBe(false);
+    expect(isNetworkError(undefined)).toBe(false);
+  });
 
   it("ignores the API URL for an absolute URL", async () => {
     vi.stubEnv("VITE_APP_API_URL", "");

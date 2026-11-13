@@ -1,6 +1,6 @@
 ## 1. Network error mark (#73)
 
-- [ ] 1.1 [standard] Starts after #63 (change 57) is merged: it extends `request.test.ts`. In `src/shared/api/request.ts` per `design.md`: `RequestError` gets `readonly isNetworkError: boolean` (default `false`), set to `true` only where `fetch` rejects and the request was not aborted; `isNetworkError(error: unknown)` exported from `~shared/api`. Unit tests in `request.test.ts`: rejected `fetch` → `isNetworkError` true; status 500 → false; missing API URL → false; aborted request → the abort is rethrown, not a `RequestError`; `isNetworkError(new Error())` → false. Verify: `npm run check` passes; set the flag on the 500 branch too → a test fails; restore.
+- [x] 1.1 [standard] Starts after #63 (change 57) is merged: it extends `request.test.ts`. In `src/shared/api/request.ts` per `design.md`: `RequestError` gets `readonly isNetworkError: boolean` (default `false`), set to `true` only where `fetch` rejects and the request was not aborted; `isNetworkError(error: unknown)` exported from `~shared/api`. Unit tests in `request.test.ts`: rejected `fetch` → `isNetworkError` true; status 500 → false; missing API URL → false; aborted request → the abort is rethrown, not a `RequestError`; `isNetworkError(new Error())` → false. Verify: `npm run check` passes; set the flag on the 500 branch too → a test fails; restore.
 
 ## 2. Messages on both pages (#73)
 
