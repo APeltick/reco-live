@@ -3,14 +3,17 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import LinearProgress from "@mui/material/LinearProgress";
 import MenuItem from "@mui/material/MenuItem";
+import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import {
   useEffect,
+  useRef,
   useState,
 } from "react";
 import {
+  generatePath,
   Link as RouterLink,
   useLocation,
   useSearchParams,
@@ -20,17 +23,22 @@ import {
   getCategories,
   getQueryCategorySlug,
   getQuerySearchText,
+  pageToPaging,
   parseProductsSearchParams,
   productsQueryToSearchParams,
+  shouldShowPagination,
   useDebouncedValue,
   useFetchProducts,
 } from "~features/products";
+import { ROUTES_CONSTANTS } from "~shared/config/routes";
 
 const SEARCH_DEBOUNCE_MS = 300;
+const PAGE_SIZE = 10;
 const T_T_DEV = {
   allCategories: "All categories",
   categoryLabel: "Category",
   loading: "Loading products",
+  pagination: "Pagination",
   noProducts: "No products found",
   retry: "Try again",
   searchLabel: "Search products",
@@ -40,7 +48,11 @@ const T_T_DEV = {
 export function ProductPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
-  const { hasConflict, query } = parseProductsSearchParams(searchParams);
+  const {
+    needsReplace,
+    page,
+    query,
+  } = parseProductsSearchParams(searchParams);
   const urlSearchText = getQuerySearchText(query);
   const categorySlug = getQueryCategorySlug(query);
 
@@ -56,12 +68,13 @@ export function ProductPage() {
     }
   }
 
-  // Both `q` and `category` in an opened link: category wins, `q` is dropped without a history entry.
+  // A non-canonical opened link (both `q` and `category`, an invalid `page` or `page=1`):
+  // rewritten once, without a history entry.
   useEffect(() => {
-    if (hasConflict) {
-      setSearchParams(productsQueryToSearchParams(query), { replace: true });
+    if (needsReplace) {
+      setSearchParams(productsQueryToSearchParams(query, page), { replace: true });
     }
-  }, [hasConflict, query, setSearchParams]);
+  }, [needsReplace, page, query, setSearchParams]);
 
   // Apply the typed text after the pause, only when it differs from the URL's `q`.
   // A programmatic clear after a category choice ("" equals the new `q`) is skipped.
@@ -86,7 +99,19 @@ export function ProductPage() {
     isError,
     isFetching,
     refetch,
-  } = useFetchProducts(query);
+  } = useFetchProducts(query, pageToPaging(page));
+  const listReference = useRef<HTMLDivElement>(null);
+  const pageCount = collection === null ? 0 : Math.ceil(collection.total / PAGE_SIZE);
+  const isShowPagination = shouldShowPagination({
+    count: pageCount,
+    page,
+    hasError: isError,
+  });
+
+  function handlePageChange(nextPage: number) {
+    setSearchParams(productsQueryToSearchParams(query, nextPage));
+    listReference.current?.scrollIntoView({ block: "start" });
+  }
 
   function handleCategoryChange(slug: string) {
     setSearchText("");
@@ -153,27 +178,40 @@ export function ProductPage() {
           {T_T_DEV.loadError}
         </Alert>
       )}
-      <Typography
-        aria-live="polite"
-        data-testid="products-status"
-        role="status"
-      >
-        {!isError && collection !== null && (collection.products.length === 0
-          ? T_T_DEV.noProducts
-          : `${String(collection.total)} products found`)}
-      </Typography>
-      {!isError && collection?.products.map((product) => (
-        <p key={product.id}>
-          <Box
-            component={RouterLink}
-            state={{ from: location.search }}
-            sx={{ color: "primary.main" }}
-            to={`/products/${String(product.id)}`}
-          >
-            {product.title}
-          </Box>
-        </p>
-      ))}
+      <Box ref={listReference}>
+        <Typography
+          aria-live="polite"
+          data-testid="products-status"
+          role="status"
+        >
+          {!isError && collection !== null && (collection.products.length === 0
+            ? T_T_DEV.noProducts
+            : `${String(collection.total)} products found`)}
+        </Typography>
+        {!isError && collection?.products.map((product) => (
+          <p key={product.id}>
+            <Box
+              component={RouterLink}
+              state={{ from: location.search }}
+              sx={{ color: "primary.main" }}
+              to={generatePath(ROUTES_CONSTANTS.productDetails, { id: String(product.id) })}
+            >
+              {product.title}
+            </Box>
+          </p>
+        ))}
+      </Box>
+      {isShowPagination && (
+        <Box aria-label={T_T_DEV.pagination} component="nav">
+          <Pagination
+            count={pageCount}
+            onChange={(_event, nextPage) => {
+              handlePageChange(nextPage);
+            }}
+            page={page}
+          />
+        </Box>
+      )}
     </Stack>
   );
 }
