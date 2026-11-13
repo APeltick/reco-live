@@ -10,9 +10,13 @@ export {
   CATEGORY_PARAM,
   getQueryCategorySlug,
   getQuerySearchText,
+  PAGE_PARAM,
+  pageToPaging,
   parseProductsSearchParams,
+  PRODUCTS_PAGE_SIZE,
   productsQueryToSearchParams,
   SEARCH_PARAM,
+  shouldShowPagination,
 } from "./product-url";
 export type { ParsedProductsParams } from "./product-url";
 export { formatUsdPrice, getProductPhoto } from "./product-view";
