@@ -1,3 +1,4 @@
+export { type CategoryOption, getCategoryOptions } from "./get-category-options";
 export { parseProductId } from "./parse-product-id";
 export { createProductBackLink } from "./product-back-link";
 export {
