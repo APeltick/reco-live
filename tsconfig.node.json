@@ -13,8 +13,10 @@
     // Uses Node.js-native ESM module semantics.
     "module": "NodeNext",
     // Resolves imports with Node.js-native ESM semantics.
-    "moduleResolution": "NodeNext"
+    "moduleResolution": "NodeNext",
+    // Playwright resolves e2e imports with explicit .ts extensions; nothing is emitted.
+    "allowImportingTsExtensions": true
   },
-  // Type-checks Vite configuration as Node.js tooling.
-  "include": ["vite.config.ts"]
+  // Type-checks Vite and Playwright configuration and the e2e tests as Node.js tooling.
+  "include": ["vite.config.ts", "playwright.config.ts", "tests/e2e/**/*.ts"]
 }
