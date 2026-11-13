@@ -22,6 +22,7 @@ export {
   type Product,
   type ProductDetailsResult,
   productReducer,
+  PRODUCTS_PAGE_SIZE,
   type ProductsCollection,
   type ProductsPaging,
   type ProductsQuery,

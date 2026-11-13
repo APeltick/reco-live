@@ -4,7 +4,7 @@ export const SEARCH_PARAM = "q";
 export const CATEGORY_PARAM = "category";
 export const PAGE_PARAM = "page";
 
-const PAGE_SIZE = 10;
+export const PRODUCTS_PAGE_SIZE = 10;
 const PLAIN_POSITIVE_INTEGER = /^[1-9]\d*$/;
 
 export interface ParsedProductsParams {
@@ -115,8 +115,8 @@ export function productsQueryToSearchParams(
 /** Page (from 1) → the paging of the request. */
 export function pageToPaging(page: number): ProductsPaging {
   return {
-    limit: PAGE_SIZE,
-    skip: (page - 1) * PAGE_SIZE,
+    limit: PRODUCTS_PAGE_SIZE,
+    skip: (page - 1) * PRODUCTS_PAGE_SIZE,
   };
 }
 

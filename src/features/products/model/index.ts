@@ -13,6 +13,7 @@ export {
   PAGE_PARAM,
   pageToPaging,
   parseProductsSearchParams,
+  PRODUCTS_PAGE_SIZE,
   productsQueryToSearchParams,
   SEARCH_PARAM,
   shouldShowPagination,

@@ -25,6 +25,7 @@ import {
   getQuerySearchText,
   pageToPaging,
   parseProductsSearchParams,
+  PRODUCTS_PAGE_SIZE,
   productsQueryToSearchParams,
   shouldShowPagination,
   useDebouncedValue,
@@ -33,7 +34,6 @@ import {
 import { ROUTES_CONSTANTS } from "~shared/config/routes";
 
 const SEARCH_DEBOUNCE_MS = 300;
-const PAGE_SIZE = 10;
 const T_T_DEV = {
   allCategories: "All categories",
   categoryLabel: "Category",
@@ -101,7 +101,7 @@ export function ProductPage() {
     refetch,
   } = useFetchProducts(query, pageToPaging(page));
   const listReference = useRef<HTMLDivElement>(null);
-  const pageCount = collection === null ? 0 : Math.ceil(collection.total / PAGE_SIZE);
+  const pageCount = collection === null ? 0 : Math.ceil(collection.total / PRODUCTS_PAGE_SIZE);
   const isShowPagination = shouldShowPagination({
     count: pageCount,
     page,
