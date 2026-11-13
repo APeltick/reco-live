@@ -293,10 +293,10 @@ export default defineConfig([
   // ---------------------------------------------------------------------------
   // TYPESCRIPT TOOLING FILES
   // ---------------------------------------------------------------------------
-  // The Vite config is linted strictly, but its API requires a default export.
+  // The Vite and Playwright configs and the e2e tests are linted strictly; the configs require a default export.
   {
     name: "tooling/typescript",
-    files: ["vite.config.ts"],
+    files: ["vite.config.ts", "playwright.config.ts", "tests/e2e/**/*.ts"],
     extends: [
       // Baseline JavaScript checks.
       js.configs.recommended,
@@ -312,7 +312,7 @@ export default defineConfig([
       stylisticConfig,
     ],
     languageOptions: {
-      // vite.config.ts runs in Node.js rather than in the browser.
+      // These files run in Node.js rather than in the browser.
       globals: globals.node,
       parserOptions: {
         // Gives TypeScript ESLint rules access to program type information.
