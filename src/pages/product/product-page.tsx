@@ -19,6 +19,7 @@ import {
 import {
   type Categories,
   getCategories,
+  getCategoryOptions,
   getQueryCategorySlug,
   getQuerySearchText,
   pageToPaging,
@@ -124,8 +125,11 @@ export function ProductPage() {
     );
   }
 
-  const hasUnlistedCategory = categorySlug !== ""
-    && categories.every((category) => category.slug !== categorySlug);
+  const categoryOptions = getCategoryOptions({
+    allLabel: T_T_DEV.allCategories,
+    categories,
+    slug: categorySlug,
+  });
 
   return (
     <Stack spacing={2}>
@@ -149,13 +153,9 @@ export function ProductPage() {
         }}
         value={categorySlug}
       >
-        <MenuItem value="">{T_T_DEV.allCategories}</MenuItem>
-        {hasUnlistedCategory && (
-          <MenuItem value={categorySlug}>{categorySlug}</MenuItem>
-        )}
-        {categories.map((category) => (
-          <MenuItem key={category.slug} value={category.slug}>
-            {category.name}
+        {categoryOptions.map((option) => (
+          <MenuItem key={option.value} value={option.value}>
+            {option.label}
           </MenuItem>
         ))}
       </TextField>
@@ -220,6 +220,7 @@ function useCategories(): Categories {
         setCategories(await getCategories(controller.signal));
       } catch {
         // categories are optional: on failure only `All categories` is offered
+        // (plus the slug from the URL, if there is a category in it)
       }
     }
 
