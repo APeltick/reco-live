@@ -202,15 +202,14 @@ export function ProductPage() {
         ))}
       </Box>
       {isShowPagination && (
-        <Box aria-label={T_T_DEV.pagination} component="nav">
-          <Pagination
-            count={pageCount}
-            onChange={(_event, nextPage) => {
-              handlePageChange(nextPage);
-            }}
-            page={page}
-          />
-        </Box>
+        <Pagination
+          aria-label={T_T_DEV.pagination}
+          count={pageCount}
+          onChange={(_event, nextPage) => {
+            handlePageChange(nextPage);
+          }}
+          page={page}
+        />
       )}
     </Stack>
   );
