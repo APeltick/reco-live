@@ -14,6 +14,8 @@ export {
   getProductPhoto,
   getQueryCategorySlug,
   getQuerySearchText,
+  PAGE_PARAM,
+  pageToPaging,
   type ParsedProductsParams,
   parseProductId,
   parseProductsSearchParams,
@@ -26,6 +28,7 @@ export {
   productsQueryToSearchParams,
   resolveProductDetails,
   SEARCH_PARAM,
+  shouldShowPagination,
   useDebouncedValue,
   useFetchProducts,
 } from "./model";
