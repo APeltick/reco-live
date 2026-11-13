@@ -28,7 +28,7 @@ See proposal.md. These are the facts as checked on 2026-11-13:
 
   An invalid value is anything but a positive integer in plain decimal, for example `0`, `-1`, `2.5`, `abc` or `02`, and also a number above `Number.MAX_SAFE_INTEGER`. The URL is rewritten with `replace` to the same query without `page`, as the existing conflict rule does. An explicit `page=1` is valid but not canonical: it is rewritten the same way, so page 1 has one address.
   - Several `page` parameters: the first one is read (`URLSearchParams.get`), and the rewrite writes back only the canonical one.
-  - The conflict rule and `page` together (`?q=phone&category=laptops&page=2`): one `replace` fixes both. `category` wins, `q` is removed, and a valid `page` is kept (page 2 of `laptops`); an invalid `page` is removed in the same rewrite.
+  - The conflict rule and `page` together (`?q=phone&category=smartphones&page=2`): one `replace` fixes both. `category` wins, `q` is removed, and a valid `page` is kept (page 2 of `smartphones`); an invalid `page` is removed in the same rewrite.
 - **Every page change pushes a history entry.** Back restores the previous page.
 - **Changing search or category drops `page`.** It is the same `setSearchParams` call, so a new query starts at page 1. Back still restores the previous query with its page.
 - **Out of range:** with `page` greater than the last page (`ceil(total / 10)`), the API returns an empty `products` with the real `total`.

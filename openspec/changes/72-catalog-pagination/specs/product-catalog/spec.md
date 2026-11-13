@@ -11,7 +11,7 @@ The list SHALL show the current result in pages of 10 products: page `p` SHALL b
 
 #### Scenario: Total is shown
 
-- **WHEN** the API returns 10 products with `total: 194`
+- **WHEN** the user opens `/product` and the API returns 10 products with `total: 194`
 - **THEN** 10 product titles, `194 products found` and pagination controls with 20 pages, page 1 marked, are shown
 
 #### Scenario: User opens the next page
@@ -108,12 +108,22 @@ Each page change SHALL add a browser history entry, so Back restores the previou
 
 ### Requirement: Invalid or out-of-range page in a link
 
-A `page` value that is not a positive integer written in plain decimal (for example `0`, `-1`, `2.5`, `abc`, `02`) SHALL be treated as page 1 and removed from the URL without a new history entry. A `page` past the last page SHALL show `No products found` (the API returns no products for it) and SHALL keep the pagination controls, so the user can go to an existing page.
+A `page` value that is not a positive integer written in plain decimal (for example `0`, `-1`, `2.5`, `abc`, `02`), or is above `Number.MAX_SAFE_INTEGER`, SHALL be treated as page 1 and removed from the URL without a new history entry. A `page` past the last page SHALL show `No products found` (the API returns no products for it) and SHALL keep the pagination controls, so the user can go to an existing page.
 
 #### Scenario: Invalid page in a link
 
 - **WHEN** the user opens `/product?q=phone&page=abc`
 - **THEN** the URL becomes `/product?q=phone` without a new history entry and the first page of the search is shown
+
+#### Scenario: Page too large to be a number
+
+- **WHEN** the user opens `/product?page=99999999999999999999`
+- **THEN** the URL becomes `/product` without a new history entry and the first page is shown
+
+#### Scenario: Search, category and page in a link
+
+- **WHEN** the user opens `/product?q=phone&category=smartphones&page=2`
+- **THEN** the URL becomes `/product?category=smartphones&page=2` in one rewrite without a new history entry, the search field is empty and page 2 of `smartphones` is shown
 
 #### Scenario: Page past the last one
 
