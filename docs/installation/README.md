@@ -16,7 +16,7 @@ For a clean, reproducible installation, use:
 npm ci
 ```
 
-Use `npm install` only when intentionally adding or updating dependencies. Commit both `package.json` and `package-lock.json` after such a change. Peer-dependency conflicts are handled by the [installation and update procedure](../development/README.md#install-and-update-dependencies) instead of enabling a global npm override.
+Use `npm install` only when intentionally adding or updating dependencies. Commit both `package.json` and `package-lock.json` after such a change. Peer-dependency conflicts are handled by the [installation and update procedure](../development/README.md#install-and-update-dependencies) instead of setting `legacy-peer-deps` in `.npmrc`.
 
 ## Browsers for screenshots and e2e
 
