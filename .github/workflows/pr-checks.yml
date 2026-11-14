@@ -45,7 +45,7 @@ jobs:
           node-version-file: .node-version
       - name: "setup: install"
         run: |
-          npm ci --legacy-peer-deps
+          npm ci
       - name: process guard
         # Process guard checks the PR (description, zones, team rules) — a push to the integration branch has no PR.
         if: github.event_name != 'push'
@@ -137,7 +137,7 @@ jobs:
           echo "AI_TEAM_E2E_WORKERS=$w" >> "$GITHUB_ENV"
       - name: "setup: install"
         run: |
-          npm ci --legacy-peer-deps
+          npm ci
       - name: "setup: e2e browsers"
         run: |
           npx playwright install --with-deps chromium
