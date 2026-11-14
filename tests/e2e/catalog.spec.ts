@@ -161,6 +161,24 @@ test.describe("catalog", () => {
       expect(categoryIndex).toBeGreaterThanOrEqual(0);
       expect(requests.slice(categoryIndex + 1)).not.toContain("/products?limit=10&skip=0");
     });
+
+    await test.step("typing mac after the category applies the search", async () => {
+      await searchField(page).fill("mac");
+      await page.clock.runFor(SETTLE_MS);
+
+      await expect(page).toHaveURL(/\/product\?q=mac$/);
+      await expect(categoryField(page)).toHaveText("All categories");
+      await expectTitles(page, MAC_TITLES);
+    });
+
+    await test.step("clearing the typed search shows the full list", async () => {
+      await searchField(page).fill("");
+      await page.clock.runFor(SETTLE_MS);
+
+      await expect(page).toHaveURL(/\/product$/);
+      await expect(page.getByText("194 products found")).toBeVisible();
+      await expectTitles(page, FIRST_PAGE_TITLES);
+    });
   });
 
   test("search and category by keyboard only", async ({ page }) => {
