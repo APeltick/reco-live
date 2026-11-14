@@ -81,5 +81,10 @@
     "Firefox >= 121",
     "Safari >= 17",
     "ios_saf >= 17"
-  ]
+  ],
+  "overrides": {
+    "tsconfck": {
+      "typescript": "$typescript"
+    }
+  }
 }

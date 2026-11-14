@@ -112,3 +112,65 @@ npm run audit
 ```
 
 If any copy in the affected range remains, keep this entry. Otherwise remove it from `docs/issues/README.md`.
+
+## `tsconfck` typescript peer — scoped override to the root TypeScript 6
+
+### Subject
+
+`tsconfck@3.1.6` (pulled in by `vite-tsconfig-paths@6.1.1`) declares an optional peer `typescript ^5.0.0`, while the project uses `typescript@6.0.3`; the install is not blocked, but `npm ls --all` reports `invalid` for the peer, so the override in `package.json` pins the peer to the root TypeScript version. The build and tests are not affected.
+
+### Description
+
+`tsconfck` is the tsconfig resolver used by `vite-tsconfig-paths`. Its `typescript` peer dependency is declared as optional with the range `^5.0.0` ([`tsconfck@3.1.6` on npm](https://www.npmjs.com/package/tsconfck/v/3.1.6)). The project uses `typescript@~6.0.2`, resolved to `6.0.3`, so the installed copy is outside the declared range.
+
+Because the peer is optional, `npm ci` is not blocked. `npm ls --all` still reports the peer as `invalid: typescript@6.0.3`, which turns a clean dependency tree into a red check. The conflict is present on the main branch as well.
+
+The package cannot be fixed permanently yet because the declared peer range is in `tsconfck` itself; it is accepted only up to TypeScript 5. Upstream, `tsconfck` is discontinued, and `vite-tsconfig-paths` has replaced it on its main branch (PR #223), but the latest published `vite-tsconfig-paths` still depends on `tsconfck@^3.0.3` (checked with `npm view vite-tsconfig-paths dependencies`), so the override stays until a release without it is adopted. The project's build already works with TypeScript 6 through `tsconfck` (`npm run build`, `npm run test`), so the override only aligns the declared range with the installed version.
+
+Affected: `tsconfck@3.1.6` (via `vite-tsconfig-paths@6.1.1`) and `typescript@6.0.3` in the root `devDependencies`. Not affected: the production bundle and its runtime dependencies.
+
+### Temporary resolution
+
+The override is set in `package.json`, scoped to the `tsconfck` package only, and maps its `typescript` peer to the root version:
+
+```json
+"overrides": {
+  "tsconfck": {
+    "typescript": "$typescript"
+  }
+}
+```
+
+Install and verify with the normal commands and no extra flags:
+
+```sh
+npm install                 # expected: the lockfile is unchanged
+npm ls --all                # expected: exit code 0, no line with "invalid"
+npm run check               # expected: typecheck, lint, tests and build pass
+```
+
+Limitations and actions that must not be taken:
+
+- Do not widen the override to all packages or to `typescript` globally: the scope is the single `tsconfck` peer.
+- Do not set `legacy-peer-deps` in `.npmrc` or pass a flag to suppress the peer check; the override is the documented exception.
+- Do not change the `typescript` version to 5 to satisfy the peer: the project is on TypeScript 6.
+
+### Tracking links
+
+- [`vite-tsconfig-paths` issue #219 "tsconfck is discontinued" (upstream report that the `tsconfck` peer blocks TypeScript 6; it links `tsconfck` issue dominikg/tsconfck#240)](https://github.com/aleclarson/vite-tsconfig-paths/issues/219)
+- [`vite-tsconfig-paths` PR #223 "Support TypeScript 7 without tsconfck" (merged 2026-08-23, replaces `tsconfck` on the main branch)](https://github.com/aleclarson/vite-tsconfig-paths/pull/223)
+- [`tsconfck@3.1.6` package page on npm (peer dependency declaration)](https://www.npmjs.com/package/tsconfck/v/3.1.6)
+
+### Removal plan
+
+The workaround becomes obsolete when the `tsconfck` package in the lockfile no longer declares an incompatible `typescript` peer, which happens either when a `tsconfck` release accepts `typescript` 6 (check with `npm view tsconfck@<version> peerDependencies`), or when the project moves to a `vite-tsconfig-paths` release that no longer depends on `tsconfck` (check with `npm view vite-tsconfig-paths@<version> dependencies`). Then:
+
+```sh
+# remove the "overrides" block from package.json, then
+npm install                 # expected: lockfile updated for the new tsconfck
+npm ls --all                # expected: exit code 0, no "invalid"
+npm run check
+npm run audit
+```
+
+If `npm ls --all` still reports `invalid` after the release, keep this entry.
