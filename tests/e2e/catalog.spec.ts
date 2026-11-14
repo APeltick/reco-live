@@ -123,6 +123,46 @@ test.describe("catalog", () => {
     });
   });
 
+  test("a late category commit keeps the category", async ({ dummyJson, page }) => {
+    await page.clock.install({ time: T0 });
+
+    await test.step("search phone is applied on paused time", async () => {
+      await page.goto("/product");
+      await expect(page.getByText("194 products found")).toBeVisible();
+      await page.clock.pauseAt(T0 + PAUSE_AHEAD_MS);
+
+      await searchField(page).fill("phone");
+      await page.clock.runFor(SETTLE_MS);
+
+      await expect(page).toHaveURL(/\/product\?q=phone$/);
+      await expectTitles(page, PHONE_TITLES);
+    });
+
+    await test.step("choosing Laptops, time moves before the laptops render", async () => {
+      await chooseCategory(page, "Laptops");
+
+      // No wait for the render here, unlike catalog (b): react-router's RouterProvider
+      // commits the new URL in a transition (`startTransition`), so moving the clock now
+      // fires the debounced "" (scheduled by the clear) before the `?category=` commit.
+      await page.clock.runFor(SETTLE_MS);
+    });
+
+    await test.step("the category stays, the field is empty, laptops are listed", async () => {
+      await expect(page).toHaveURL(/\/product\?category=laptops$/);
+      await expect(searchField(page)).toHaveValue("");
+      await expectTitles(page, LAPTOP_TITLES);
+    });
+
+    await test.step("no full-list request after the category request", () => {
+      const { requests } = dummyJson;
+      const categoryIndex = requests.findIndex((request) =>
+        request.startsWith("/products/category/laptops"));
+
+      expect(categoryIndex).toBeGreaterThanOrEqual(0);
+      expect(requests.slice(categoryIndex + 1)).not.toContain("/products?limit=10&skip=0");
+    });
+  });
+
   test("search and category by keyboard only", async ({ page }) => {
     await page.goto("/product");
     await expect(page.getByText("194 products found")).toBeVisible();
