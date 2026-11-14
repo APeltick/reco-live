@@ -1,0 +1,112 @@
+# managed by AI kit
+# ai-kit-version: 0.3.1-dev
+# AI kit: the full e2e lane, cut into parts (spec/05 §8, DEC-0063, DEC-0071, DEC-0072). Built by `ai-team ci render`.
+# Runs: before the merge (with the merge queue — on the merge group, skipped on the PR job and full-result answers «ok»;
+# without it — a required check of the «ready» PR) and on a schedule on the head of the integration branch — not at the top of the hour
+# (the time — project overlay → schedule.nightly_full in the zone project.timezone, winter time, converted to UTC).
+# GitHub runs a schedule only from the default branch: this file must be there too (ai-team doctor checks).
+# A red run on the integration branch (schedule or manual) — issue full-tests-failure (an open one exists — a comment).
+# The «setup: …» steps are CI setup: red there means «CI is broken», not the PR's fault (DEC-0071).
+name: full-tests
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [main]
+  schedule:
+    - cron: "17 0 * * *"
+  workflow_dispatch:
+concurrency:
+  group: full-tests-${{ github.event.pull_request.number || github.event.merge_group.head_ref || github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+  issues: write
+jobs:
+  e2e-full:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1]
+    # ai-kit:keep full-services
+    # ai-kit:keep-end
+    # ai-kit:keep full-env
+    # ai-kit:keep-end
+    steps:
+      - name: "setup: checkout"
+        uses: actions/checkout@v4
+        with:
+          # On a schedule — the head of the integration branch (the schedule comes from the default branch).
+          ref: ${{ github.event_name == 'schedule' && 'main' || '' }}
+      - name: "setup: node"
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+      - name: "setup: workers"
+        # Workers — half of the cores of the CI machine (DEC-0069): 4 cores → 2 in each part.
+        run: |
+          w=$(( $(nproc) / 2 )); [ "$w" -ge 1 ] || w=1
+          echo "AI_TEAM_E2E_WORKERS=$w" >> "$GITHUB_ENV"
+      - name: "setup: install"
+        run: |
+          npm ci --legacy-peer-deps
+      - name: "setup: e2e browsers"
+        run: |
+          npx playwright install --with-deps chromium
+      - name: build
+        run: |
+          VITE_APP_API_URL=https://dummyjson.com npm run build
+      - name: e2e full — part ${{ matrix.shard }} of 1 (quarantine does not block)
+        run: |
+          export PLAYWRIGHT_JSON_OUTPUT_NAME="$GITHUB_WORKSPACE/e2e-results.json"
+          npx playwright test --shard=${{ matrix.shard }}/1 --workers=$AI_TEAM_E2E_WORKERS --grep-invert @quarantine --reporter=list,json,html
+      - name: quarantine — runs, does not block (spec/05 §6)
+        continue-on-error: true
+        run: |
+          export PLAYWRIGHT_JSON_OUTPUT_NAME="$GITHUB_WORKSPACE/e2e-quarantine.json"
+          npx playwright test --shard=${{ matrix.shard }}/1 --workers=$AI_TEAM_E2E_WORKERS --grep @quarantine --pass-with-no-tests --reporter=list,json
+      - name: flaky → issue tracker
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/ai-team/flaky-report.mjs e2e-results.json e2e-quarantine.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-full-${{ matrix.shard }}
+          path: |
+            playwright-report/
+            test-results/
+            e2e-*.json
+          retention-days: 14
+  full-result:
+    if: always()
+    needs: [e2e-full]
+    runs-on: ubuntu-latest
+    steps:
+      - name: result
+        env:
+          RESULT: ${{ needs.e2e-full.result }}
+        run: |
+          case "$RESULT" in success|skipped) echo "ok: $RESULT" ;; *) echo "red: $RESULT"; exit 1 ;; esac
+  full-tests-failure:
+    # A red full on the integration branch (by schedule or manual) — an issue, everyone who watches the repository sees it
+    # (the schedule email goes only to whoever last edited the cron). An open one exists — a comment, not a second one.
+    needs: [e2e-full]
+    if: always() && needs.e2e-full.result == 'failure' && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.ref_name == 'main'))
+    runs-on: ubuntu-latest
+    steps:
+      - name: issue full-tests-failure
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          SHA: ${{ github.sha }}
+        run: |
+          gh label create full-tests-failure -R "$REPO" --color B60205 --description "Red full on the integration branch (DEC-0063)" 2>/dev/null || true
+          n="$(gh issue list -R "$REPO" --label full-tests-failure --state open --json number --jq '.[0].number // empty')"
+          text="Red full e2e on main (${SHA:0:8}): $RUN_URL"
+          if [ -n "$n" ]; then gh issue comment "$n" -R "$REPO" --body "$text"
+          else gh issue create -R "$REPO" --title "full-tests: red run on main" --label full-tests-failure --body "$text — next as a breakage, through the board"; fi

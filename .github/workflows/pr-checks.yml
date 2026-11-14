@@ -108,10 +108,85 @@ jobs:
         run: |
           if [ ! -f .github/ai-team/ci-baseline.mjs ]; then echo "not measured: no .github/ai-team/ci-baseline.mjs — update the AI kit"; exit 0; fi
           node .github/ai-team/ci-baseline.mjs check --base "$BASE_SHA" --started "${AI_TEAM_CI_T0:-}" "$RUNNER_TEMP/ai-kit-typecheck.log" "$RUNNER_TEMP/ai-kit-lint.log"
+  e2e-targeted:
+    needs: checks
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: read # the PR description via gh pr view (its own permissions block replaces the top one entirely)
+    # ai-kit:keep e2e-services
+    # ai-kit:keep-end
+    # ai-kit:keep e2e-env
+    # ai-kit:keep-end
+    steps:
+      - name: "setup: checkout"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: "setup: node"
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+      - name: "setup: workers"
+        # Workers — half of the cores of the CI machine (DEC-0069).
+        run: |
+          w=$(( $(nproc) / 2 )); [ "$w" -ge 1 ] || w=1
+          echo "AI_TEAM_E2E_WORKERS=$w" >> "$GITHUB_ENV"
+      - name: "setup: install"
+        run: |
+          npm ci --legacy-peer-deps
+      - name: "setup: e2e browsers"
+        run: |
+          npx playwright install --with-deps chromium
+      - name: build
+        run: |
+          VITE_APP_API_URL=https://dummyjson.com npm run build
+      - name: "e2e — from the E2E: field, affected by the changes (e2e-map) and smoke; quarantine does not block"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          body="$(gh pr view "$PR" -R "$GITHUB_REPOSITORY" --json body --jq .body)" || { echo "could not read the description of PR #$PR"; exit 1; }
+          export PR_BODY="$body"
+          # $(…), not < <(…): node failed — the step failed. Empty — no targets (not one empty target «»).
+          out="$(node .github/ai-team/process-guard.mjs e2e-targets --base "$BASE_SHA" --regex)"
+          targets=()
+          [ -n "$out" ] && mapfile -t targets <<<"$out"
+          # All targets are in quarantine — «no tests» is not red.
+          if [ ${#targets[@]} -gt 0 ]; then
+            export PLAYWRIGHT_JSON_OUTPUT_NAME="$GITHUB_WORKSPACE/e2e-results.json" PLAYWRIGHT_HTML_OUTPUT_DIR=playwright-report PLAYWRIGHT_HTML_REPORT=playwright-report
+            npx playwright test "${targets[@]}" --workers=$AI_TEAM_E2E_WORKERS --grep-invert @quarantine --pass-with-no-tests --reporter=list,json,html
+          fi
+          export PLAYWRIGHT_JSON_OUTPUT_NAME="$GITHUB_WORKSPACE/e2e-smoke.json" PLAYWRIGHT_HTML_OUTPUT_DIR=playwright-report-smoke PLAYWRIGHT_HTML_REPORT=playwright-report-smoke
+          npx playwright test --grep @smoke --workers=$AI_TEAM_E2E_WORKERS --grep-invert @quarantine --pass-with-no-tests --reporter=list,json,html
+      - name: quarantine — runs, does not block (spec/05 §6)
+        continue-on-error: true
+        run: |
+          export PLAYWRIGHT_JSON_OUTPUT_NAME="$GITHUB_WORKSPACE/e2e-quarantine.json"
+          npx playwright test --workers=$AI_TEAM_E2E_WORKERS --grep @quarantine --pass-with-no-tests --reporter=list,json
+      - name: flaky → issue tracker
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/ai-team/flaky-report.mjs e2e-results.json e2e-smoke.json e2e-quarantine.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-targeted-report
+          path: |
+            playwright-report/
+            playwright-report-smoke/
+            test-results/
+            e2e-*.json
+          retention-days: 14
   pr-result:
     # One required check instead of many: skipped (draft, another event) is not red.
     if: always()
-    needs: [checks]
+    needs: [checks, e2e-targeted]
     runs-on: ubuntu-latest
     steps:
       - name: result
