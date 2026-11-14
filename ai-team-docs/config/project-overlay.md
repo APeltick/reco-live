@@ -228,6 +228,10 @@
 | part | globs |
 |---|---|
 | frontend | src/**, public/**, index.html |
+| e2e | tests/e2e/** |
+| docs | docs/**, openspec/**, README.md |
+| tooling | package.json, package-lock.json, .npmrc, .node-version, .gitignore, .gitattributes, eslint.config.js, stylelint.config.js, vite.config.ts, playwright.config.ts, tsconfig*.json, lefthook.yml |
+| team-rules | .github/**, ai-team-docs/**, CLAUDE.md, .claude/**, .mcp.json |
 
 ## task-types
 
