@@ -10,4 +10,4 @@
 
 ## 3. e2e map (#82, team rules)
 
-- [ ] 3.1 [light] Lead, after 2.1 and 2.2 are merged, in a spec worktree: `ai-team-docs/config/project-overlay.md` → `e2e-map` rows per `design.md` "e2e-map"; `ai-team ci render --check` (re-render if stale). PR with `## How it affects colleagues`; merged only by the operator's word with the PR number. Verify: `ai-team gate --plan` for a PR touching `src/pages/product/product-page.tsx` lists `tests/e2e/catalog.spec.ts`; `ai-team doctor` has no `e2e-map` warning.
+- [x] 3.1 [light] Lead, after 2.1 and 2.2 are merged, in a spec worktree: `ai-team-docs/config/project-overlay.md` → `e2e-map` rows per `design.md` "e2e-map"; `ai-team ci render --check` (re-render if stale). PR with `## How it affects colleagues`; merged only by the operator's word with the PR number. Verify: `ai-team gate --plan` for a PR touching `src/pages/product/product-page.tsx` lists `tests/e2e/catalog.spec.ts`; `ai-team doctor` has no `e2e-map` warning.
