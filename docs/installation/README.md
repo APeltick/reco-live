@@ -44,8 +44,8 @@ Then run the tests:
 npm run test:e2e
 ```
 
-- `playwright.config.ts` serves the built `dist` through `vite preview` on `127.0.0.1` (port `4173` by default, or `PORT`) and starts that server itself. It does not build the app, so rebuild after every change to the source.
-- To run against a server that is already running, set `PLAYWRIGHT_BASE_URL` (for example `PLAYWRIGHT_BASE_URL=http://127.0.0.1:4173 npm run test:e2e`). If a server answers at that URL, it is reused and no second server is started; the server must serve the build made with the command above.
+- `playwright.config.ts` serves the built `dist` on the base URL: a server already answering there is reused (`reuseExistingServer: true`); otherwise `vite preview` is started on `127.0.0.1` at the base URL's port (`4173` by default, or `PORT`). It does not build the app, so rebuild after every change to the source.
+- To run against a server that is already running, set `PLAYWRIGHT_BASE_URL` (for example `PLAYWRIGHT_BASE_URL=http://127.0.0.1:4173 npm run test:e2e`); the server must serve the build made with the command above.
 - To run only the smoke test, pass `--grep` after `--`. npm passes the flag to Playwright only with the separator:
 
   ```sh
