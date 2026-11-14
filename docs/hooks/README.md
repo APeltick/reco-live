@@ -40,14 +40,6 @@ Unit tests run as part of `npm run check`, so this hook enforces them before eve
 
 ## Peer-dependency policy
 
-Do not enable `legacy-peer-deps` merely to make a new dependency install. First run the ordinary installation command and investigate the conflict:
-
-```sh
-npm install <package> --save-dev
-npm explain <package-that-reports-the-conflict>
-npm ls <package-that-reports-the-conflict>
-```
-
-Then check whether an update of the package, the peer package, or a compatible alternative removes the conflict. Prefer that real fix. Only when the affected package is necessary, the incompatibility is understood, and no compatible update or replacement exists may `legacy-peer-deps` be used temporarily. Record the exact package, versions, reason, and upstream tracking link in project documentation. Revisit the exception whenever dependencies are upgraded.
+A new dependency must install with plain `npm ci` or `npm install`; the pre-push check enforces it. The full policy is in [Peer-dependency conflicts](../issues/README.md#peer-dependency-conflicts) and [Install and update dependencies](../development/README.md#install-and-update-dependencies).
 
 See [known dependency issues](../issues/README.md) for open issues and their temporary resolutions.
