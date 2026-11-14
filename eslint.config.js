@@ -177,7 +177,7 @@ const eslintCommentsRules = {
   "@eslint-community/eslint-comments/no-unused-enable": "error",
 };
 
-// Baseline import correctness rules shared by the application and Vite config.
+// Baseline import correctness rules shared by the application code and the TypeScript tooling files (vite.config.ts, playwright.config.ts, tests/e2e/**).
 const importRules = {
   // All import statements must appear before executable code.
   "import-x/first": "error",
@@ -333,7 +333,7 @@ export default defineConfig([
       ...importRules,
       // Shared deterministic import and export sorting.
       ...sortingRules,
-      // Vite expects a default configuration export, so it is allowed here.
+      // The Vite and Playwright configs require a default export, so default exports are allowed for every file in this block.
       "import-x/no-default-export": "off",
     },
   },
