@@ -108,6 +108,9 @@
 | src/app/layouts/main-layout/** | tests/e2e/product-details.spec.ts |
 | src/shared/ui/error-alert/** | tests/e2e/product-details.spec.ts |
 | src/shared/ui/container-loader/** | tests/e2e/product-details.spec.ts |
+| src/shared/api/request.ts | tests/e2e/product-details.spec.ts |
+| src/pages/not-found/** | tests/e2e/product-details.spec.ts |
+| src/app/error-handling/** | tests/e2e/product-details.spec.ts |
 | tests/e2e/fixtures/** | tests/e2e/**/*.spec.ts |
 
 ## screenshot-masks
