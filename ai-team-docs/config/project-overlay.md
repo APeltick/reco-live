@@ -101,7 +101,9 @@
 
 | path | e2e |
 |---|---|
-| — | — |
+| src/pages/product/** | tests/e2e/catalog.spec.ts |
+| src/features/products/** | tests/e2e/catalog.spec.ts |
+| tests/e2e/fixtures/** | tests/e2e/**/*.spec.ts |
 
 ## screenshot-masks
 
