@@ -5,7 +5,7 @@ import { fixupPluginRules } from "@eslint/compat";
 import { createTypeScriptImportResolver } from "eslint-import-resolver-typescript";
 import compat from "eslint-plugin-compat";
 import importX from "eslint-plugin-import-x";
-import jsxA11y from "eslint-plugin-jsx-a11y";
+import jsxA11y from "eslint-plugin-jsx-a11y-x";
 import newlineDestructuring from "eslint-plugin-newline-destructuring";
 import noUnsanitized from "eslint-plugin-no-unsanitized";
 import perfectionist from "eslint-plugin-perfectionist";
@@ -116,33 +116,34 @@ const stylisticConfig = {
   },
 };
 
-// eslint-plugin-jsx-a11y still uses the pre-v9 ESLint API, so its strict preset
-// is loaded through the official compatibility adapter.
+// eslint-plugin-jsx-a11y-x is the ESLint 9/10 compatible fork of
+// eslint-plugin-jsx-a11y: same rules, its own `jsx-a11y-x/` rule prefix and
+// settings key. It uses the current ESLint API, so no compatibility adapter.
 const jsxA11yStrictConfig = {
-  ...jsxA11y.flatConfigs.strict,
-  plugins: { "jsx-a11y": fixupPluginRules(jsxA11y) },
+  ...jsxA11y.configs.strict,
   rules: {
-    ...jsxA11y.flatConfigs.strict.rules,
+    ...jsxA11y.configs.strict.rules,
     // Link text must explain its purpose instead of using ambiguous text like "here".
-    "jsx-a11y/anchor-ambiguous-text": "error",
+    "jsx-a11y-x/anchor-ambiguous-text": "error",
     // Prevents aria-hidden on an element that can still receive focus.
-    "jsx-a11y/no-aria-hidden-on-focusable": "error",
+    "jsx-a11y-x/no-aria-hidden-on-focusable": "error",
     // Ensures that lang contains a valid language tag.
-    "jsx-a11y/lang": "error",
+    "jsx-a11y-x/lang": "error",
   },
 };
 
-// Teaches jsx-a11y about base MUI ui and the `component` prop, which
+// Teaches jsx-a11y-x about base MUI ui and the `component` prop, which
 // changes the rendered DOM element, for example <Button component="a">.
+// The fork reads its settings only under its own `jsx-a11y-x` key.
 const jsxA11ySettings = {
-  "jsx-a11y": {
+  "jsx-a11y-x": {
     components: {
       // Treats MUI Button as a native button for accessibility analysis.
       Button: "button",
       // Treats MUI Link as a native anchor for accessibility analysis.
       Link: "a",
     },
-    // Makes jsx-a11y respect MUI's polymorphic component prop.
+    // Makes jsx-a11y-x respect MUI's polymorphic component prop.
     polymorphicPropName: "component",
   },
 };
