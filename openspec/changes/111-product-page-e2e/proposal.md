@@ -1,6 +1,6 @@
 ## Why
 
-The product page `/products/:id` (spec `product-details`, change 71) is proven in a browser only by the smoke (catalog → product → `Back to products`) and by manual Proof. Units prove the helpers (`createProductBackLink`, `getProductPhoto`, `formatUsdPrice`, `resolveProductDetails`), not their wiring: the catalog passing its query in the link state (`src/pages/product/product-page.tsx:189`), the route loader turning not-found into the 404 page (`src/app/router/router.tsx:32-44`), the loading indicators (`HydrateFallback` and the layout's navigation loader), the error alert and the retry through the revalidator. The operator asked for it (OI-17, OI-122; issue #111 opened on OI-154) once the strict stub of change 82 exists (#110, merged).
+The product page `/products/:id` (spec `product-details`, change 71) is proven in a browser only by the smoke (catalog → product → `Back to products`) and by manual Proof. Units prove the helpers (`createProductBackLink`, `getProductPhoto`, `formatUsdPrice`, `resolveProductDetails`), not their wiring (the catalog passing its query in the link state, `src/pages/product/product-page.tsx:189`, is already proven by `catalog.spec.ts`): the route loader turning not-found into the 404 page (`src/app/router/router.tsx:32-44`), the loading indicators (`HydrateFallback` and the layout's navigation loader), the error alert and the retry through the revalidator. The operator asked for it (OI-17, OI-122; issue #111 opened on OI-154) once the strict stub of change 82 exists (#110, merged).
 
 ## What Changes
 
