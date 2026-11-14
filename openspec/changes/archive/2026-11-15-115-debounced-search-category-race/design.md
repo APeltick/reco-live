@@ -1,6 +1,6 @@
 ## Context
 
-`ProductPage` keeps the field text in state (`searchText`) and the URL in `useSearchParams`. `handleCategoryChange` (`product-page.tsx:116-126`) does `setSearchText("")` and `setSearchParams(category)` in one handler. `useDebouncedValue(searchText.trim(), 300, isSkipped, apply)` (`:80-94`) schedules `apply` through `scheduleDebounced` (`schedule-debounced.ts`), which checks `isSkipped` up front and again when the timer fires. The hook stores `isSkipped` in a ref that is updated in an effect after every commit (`use-debounced-value.ts:21-24`). `isSkipped` is `(text) => text === urlSearchText`, where `urlSearchText` is the value of the last committed render.
+`ProductPage` keeps the field text in state (`searchText`) and the URL in `useSearchParams`. `handleCategoryChange` (`product-page.tsx:116-126`) does `setSearchText("")` and `setSearchParams(category)` in one handler. `useDebouncedValue(searchText.trim(), 300, isSkipped, apply)` (`:80-94`) schedules `apply` through `scheduleDebounced` (`schedule-debounced.ts`), which checks `isSkipped` up front and again when the timer fires. The hook stores `isSkipped` in a ref that is updated in an effect after every commit (`use-debounced-value.ts:21-24`). `isSkipped` is `(text) => text === urlSearchText`, where `urlSearchText` is the value of the last committed render. (Line refs are as of main ff4ed92, before #134; after #134, `handleCategoryChange` is at `:121-132` and the `useDebouncedValue` call at `:85-99`.)
 
 ## Goals / Non-Goals
 
