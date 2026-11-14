@@ -13,5 +13,15 @@
     "slug": "furniture",
     "name": "Furniture",
     "url": "https://dummyjson.com/products/category/furniture"
+  },
+  {
+    "slug": "laptops",
+    "name": "Laptops",
+    "url": "https://dummyjson.com/products/category/laptops"
+  },
+  {
+    "slug": "smartphones",
+    "name": "Smartphones",
+    "url": "https://dummyjson.com/products/category/smartphones"
   }
 ]
