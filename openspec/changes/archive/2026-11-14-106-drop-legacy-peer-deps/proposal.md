@@ -27,3 +27,4 @@ No product behaviour changes (`skip_specs: true`).
 - Changed: `package.json`, `package-lock.json`, `eslint.config.js` (risky paths: full review), docs listed above, `lefthook.yml`.
 - Team rules: `ai-team-docs/config/project-overlay.md` (`commands.install`) and the rendered CI workflows — a separate lead PR, merged only by the operator's word with its PR number.
 - Every install (local, hooks, gate, CI) validates peers again.
+- Also in `package.json` (task 1.1, the operator's word OI-157): an override `tsconfck` → `$typescript` for its optional TypeScript peer, documented in `docs/issues/README.md`.
