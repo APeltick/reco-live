@@ -8,11 +8,11 @@ This project uses ESLint as the formatter and linter for JavaScript, TypeScript,
 
 | File | Responsibility |
 | --- | --- |
-| `eslint.config.js` | Flat ESLint configuration for config files, Vite tooling, and application source. |
+| `eslint.config.js` | Flat ESLint configuration for config files, the TypeScript tooling files (`vite.config.ts`, `playwright.config.ts`, `tests/e2e/**`), and application source. |
 | `stylelint.config.js` | Linting for CSS files and Emotion tagged templates. |
 | `tsconfig.base.json` | Shared strict TypeScript policy. |
 | `tsconfig.app.json` | Browser application compiler settings. |
-| `tsconfig.node.json` | Node.js settings for `vite.config.ts`. |
+| `tsconfig.node.json` | Node.js settings for `vite.config.ts`, `playwright.config.ts`, and the e2e tests in `tests/e2e/**`. |
 | `vite.config.ts` | Vite, React, MUI styling-engine, browser target, and local-server settings. |
 | `.npmrc` | Saves dependency versions exactly. |
 | `.node-version` | Declares the expected Node.js release. |
@@ -25,7 +25,7 @@ This project uses ESLint as the formatter and linter for JavaScript, TypeScript,
 
 ### TypeScript tooling
 
-`vite.config.ts` uses strict type-aware TypeScript rules, import validation and sorting, and Node.js globals. Default exports are allowed here because Vite's configuration API requires one.
+`vite.config.ts`, `playwright.config.ts`, and the e2e tests in `tests/e2e/**` use strict type-aware TypeScript rules, import validation and sorting, and Node.js globals. Default exports are allowed in these files because the Vite and Playwright configuration APIs require one.
 
 ### Application code
 
