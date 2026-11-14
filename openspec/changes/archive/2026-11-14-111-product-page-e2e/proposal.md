@@ -22,6 +22,6 @@ No product behaviour changes (`skip_specs: true`).
 
 ## Impact
 
-- Changed: `tests/e2e/fixtures/mock-dummy-json.ts`; new: `tests/e2e/product-details.spec.ts`. No `src/` changes.
+- Changed: `tests/e2e/fixtures/mock-dummy-json.ts`; new: `tests/e2e/product-details.spec.ts` and `tests/e2e/stub-guard.spec.ts` (the stub's own W1 self-test, design.md "The guard's self-test"). No `src/` changes.
 - Team rules: `ai-team-docs/config/project-overlay.md` → `e2e-map` (task 3.1, a lead PR, merged only by the operator's word with the PR number).
 - Depends on change 82 (#110, merged): `test.ts` fixture, `requests`, `hold`, the origin guard.
