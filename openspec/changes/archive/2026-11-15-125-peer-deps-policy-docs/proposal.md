@@ -23,4 +23,4 @@ Docs and comments only (`skip_specs: true`).
 
 ## Impact
 
-- Changed: `docs/issues/README.md`, `docs/eslint/README.md`, `docs/package/README.md`, `eslint.config.js` (comments only). No behaviour, no rule, no config value changes.
+- Changed: `docs/issues/README.md`, `docs/eslint/README.md`, `docs/package/README.md`, `docs/development/README.md` (its restatement of the exception rule became a link to the full policy, #131), `eslint.config.js` (comments only). No behaviour, no rule, no config value changes.
