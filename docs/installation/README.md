@@ -8,15 +8,15 @@
 The required Node.js version is stored in `.node-version`. New dependencies are saved as exact versions through `.npmrc`, and `package-lock.json` records the complete dependency tree.
 
 ## Install dependencies
-⚠️ The current exception `--legacy-peer-deps` and its removal criteria are documented in [issues doc - eslint-plugin-jsx-a11y and ESLint 10](../issues/README.md). And don't forget adding if new issue will appear. ⚠️
+Known dependency issues and their temporary resolutions are listed in [the issues doc](../issues/README.md). Add new unresolved issues there using the documented template.
 
 For a clean, reproducible installation, use:
 
 ```sh
-npm ci --legacy-peer-deps
+npm ci
 ```
 
-Use `npm install` only when intentionally adding or updating dependencies. Commit both `package.json` and `package-lock.json` after such a change. This project has one temporary, explicitly documented peer-dependency exception; follow the [installation and update procedure](../development/README.md#install-and-update-dependencies) instead of enabling a global npm override.
+Use `npm install` only when intentionally adding or updating dependencies. Commit both `package.json` and `package-lock.json` after such a change. Peer-dependency conflicts are handled by the [installation and update procedure](../development/README.md#install-and-update-dependencies) instead of enabling a global npm override.
 
 ## Browsers for screenshots and e2e
 

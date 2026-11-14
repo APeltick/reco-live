@@ -13,7 +13,7 @@ Vite serves the application with Hot Module Replacement. The server binds to `12
 Use a clean, reproducible install for an existing checkout:
 
 ```sh
-npm ci --legacy-peer-deps
+npm ci
 ```
 
 When adding or updating a dependency, first run the ordinary install command. This lets npm report peer-dependency conflicts instead of silently accepting them:
@@ -29,9 +29,9 @@ npm explain <package-that-reports-the-conflict>
 npm ls <package-that-reports-the-conflict>
 ```
 
-Prefer upgrading the package, its peer dependency, or using a compatible alternative. Use `--legacy-peer-deps` only for an understood, documented exception after those options have been checked.
+Prefer upgrading the package, its peer dependency, or using a compatible alternative. Use a flag that bypasses peer-dependency validation only for an understood, documented exception after those options have been checked, and record it in known dependency issues.
 
-⚠️ The current exception `--legacy-peer-deps` and its removal criteria are documented in [issues doc - eslint-plugin-jsx-a11y and ESLint 10](../issues/README.md). And don't forget adding if new issue will appear. ⚠️
+Known dependency issues and their temporary resolutions are listed in [the issues doc](../issues/README.md). Add new unresolved issues there using the documented template.
 
 ## Build for production
 

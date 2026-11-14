@@ -9,7 +9,7 @@ pre-push:
   parallel: true
   jobs:
     - name: Verify lockfile installation
-      run: npm ci --dry-run --ignore-scripts --legacy-peer-deps
+      run: npm ci --dry-run --ignore-scripts
 
     - name: Run production quality gate
       run: npm run check
