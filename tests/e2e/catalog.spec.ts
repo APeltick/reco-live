@@ -90,6 +90,13 @@ test.describe("catalog", () => {
 
     await test.step("choosing Laptops clears the field", async () => {
       await chooseCategory(page, "Laptops");
+
+      // `runFor` fires every timer in one synchronous pass. Let React commit the new URL
+      // and flush its effects first (the laptops rendered), so the skip rule reads the
+      // URL the page has now, not the previous `q=phone`.
+      await expect(searchField(page)).toHaveValue("");
+      await expectTitles(page, LAPTOP_TITLES);
+
       // Well over the debounce: the pending debounced "" has fired, the skip rule decides.
       await page.clock.runFor(SETTLE_MS);
 
@@ -152,11 +159,17 @@ test.describe("catalog", () => {
     const pagination = page.getByRole("navigation", { name: "Pagination" });
 
     await test.step("page 2 is opened and marked", async () => {
-      await pagination.getByRole("button", { name: "Go to page 2" }).click();
+      await pagination.getByRole("button", {
+        exact: true,
+        name: "Go to page 2",
+      }).click();
 
       await expect(page).toHaveURL(/\/product\?page=2$/);
       await expectTitles(page, SECOND_PAGE_TITLES);
-      await expect(pagination.getByRole("button", { name: "page 2" }))
+      await expect(pagination.getByRole("button", {
+        exact: true,
+        name: "page 2",
+      }))
         .toHaveAttribute("aria-current", "page");
     });
 
