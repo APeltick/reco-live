@@ -33,7 +33,11 @@ export interface DummyJsonOverrides {
 export interface DummyJsonHold {
   /** Resolves when the browser has sent the parked request. */
   arrived: Promise<void>;
-  /** `"aborted"` when the page aborted the parked request, `"fulfilled"` once the released response finished. */
+  /**
+   * `"aborted"` when the page aborted the parked request, or when the stub aborted it on
+   * release because it has no fixture (recorded as a violation); `"fulfilled"` once the
+   * released response finished.
+   */
   outcome: Promise<"aborted" | "fulfilled">;
   /** Answers the parked request (call after `arrived`); an already aborted request is ignored. */
   release: () => Promise<void>;
@@ -49,19 +53,42 @@ export interface DummyJsonHold {
  *   without a fixture, `blocked: <url>` for any other origin); the fixture fails the test
  *   when it is not empty.
  * - `hold(match)`: `match` is a `path + search` string or a predicate on it; parks only the
- *   FIRST matching request until `release()`, later matches are answered at once.
+ *   FIRST matching request until `release()`, later matches are answered at once. A held
+ *   request with no fixture is recorded as a violation and aborted on `release()` (like an
+ *   unheld one), `outcome` resolves `"aborted"`.
+ * - `fail(match, failure)`: `match` as in `hold`; fails only the FIRST matching request, later
+ *   ones get the normal answer (a retry can succeed). `failure` is `{ status }` (that status,
+ *   an empty JSON body and the stub's CORS headers, so `fetch` resolves and the app sees the
+ *   status) or `"network"` (`route.abort("internetdisconnected")`: `fetch` rejects, the app
+ *   shows "No connection"). Checked before the routing and before `hold`, so any DummyJSON
+ *   path can fail (with or without a fixture), and `fail` + `hold` on one path fail the first
+ *   request and hold the second. The failed request is logged in `requests`, not a violation.
+ *   Returns a promise that resolves once the failure was served (do not await it before
+ *   triggering the request).
+ * - Clearing `violations` (`violations.length = 0`) is allowed for a test that checks the
+ *   guard itself (`stub-guard.spec.ts`); otherwise the fixture fails the test at teardown.
  */
 export interface DummyJsonHandle {
+  fail: (match: HoldMatch, failure: DummyJsonFailure) => Promise<void>;
   hold: (match: HoldMatch) => DummyJsonHold;
   readonly requests: string[];
   readonly violations: string[];
 }
+
+export type DummyJsonFailure = "network" | { status: number };
 
 export type HoldMatch = string | ((pathAndSearch: string) => boolean);
 
 interface MockOptions {
   /** The app's base URL: its origin is the only one besides DummyJSON/CDN let through. */
   baseURL?: string | undefined;
+}
+
+interface PendingFail {
+  failure: DummyJsonFailure;
+  isTaken: boolean;
+  match: (pathAndSearch: string) => boolean;
+  served: () => void;
 }
 
 interface PendingHold {
@@ -98,6 +125,7 @@ export async function mockDummyJson(
   const requests: string[] = [];
   const violations: string[] = [];
   const holds: PendingHold[] = [];
+  const fails: PendingFail[] = [];
 
   await context.route("**/*", async (route) => {
     const url = route.request().url();
@@ -148,11 +176,21 @@ export async function mockDummyJson(
 
     requests.push(pathAndSearch);
 
+    const failing = fails.find((candidate) => !candidate.isTaken && candidate.match(pathAndSearch));
+
+    if (failing !== undefined) {
+      failing.isTaken = true;
+      await serveFailure(route, failing.failure);
+      failing.served();
+
+      return;
+    }
+
     const hold = holds.find((candidate) => !candidate.isTaken && candidate.match(pathAndSearch));
 
     if (hold !== undefined) {
       hold.isTaken = true;
-      await park(context, route, hold, () => pickBody(url, fixtures));
+      await park(context, route, hold, () => pickBody(url, fixtures), violations);
 
       return;
     }
@@ -172,11 +210,19 @@ export async function mockDummyJson(
     });
   });
 
+  function fail(match: HoldMatch, failure: DummyJsonFailure): Promise<void> {
+    return new Promise<void>((resolve) => {
+      fails.push({
+        failure,
+        isTaken: false,
+        match: toMatcher(match),
+        served: resolve,
+      });
+    });
+  }
+
   function hold(match: HoldMatch): DummyJsonHold {
-    const matcher = typeof match === "string"
-      ? (pathAndSearch: string) => pathAndSearch === match
-      : match;
-    const pending = createPendingHold(matcher);
+    const pending = createPendingHold(toMatcher(match));
 
     holds.push(pending);
 
@@ -191,10 +237,29 @@ export async function mockDummyJson(
   }
 
   return {
+    fail,
     hold,
     requests,
     violations,
   };
+}
+
+function toMatcher(match: HoldMatch): (pathAndSearch: string) => boolean {
+  return typeof match === "string" ? (pathAndSearch) => pathAndSearch === match : match;
+}
+
+async function serveFailure(route: Route, failure: DummyJsonFailure): Promise<void> {
+  if (failure === "network") {
+    await route.abort("internetdisconnected");
+
+    return;
+  }
+
+  await route.fulfill({
+    headers: CORS_HEADERS,
+    json: {},
+    status: failure.status,
+  });
 }
 
 type PendingHoldWithPromises = PendingHold & {
@@ -240,6 +305,7 @@ async function park(
   route: Route,
   hold: PendingHold,
   pickBodyForRoute: () => unknown,
+  violations: string[],
 ): Promise<void> {
   const request = route.request();
   const state = { isAborted: false };
@@ -256,14 +322,19 @@ async function park(
 
   try {
     if (!state.isAborted) {
+      const body = pickBodyForRoute();
+
+      if (body === undefined) {
+        violations.push(`unmatched: ${request.url()}`);
+        await route.abort();
+        hold.outcome("aborted");
+
+        return;
+      }
+
       await route.fulfill({
         headers: CORS_HEADERS,
-        json: pickBodyForRoute() ?? {
-          products: [],
-          total: 0,
-          skip: 0,
-          limit: 10,
-        },
+        json: body,
       });
       const response = await request.response();
 
