@@ -10,6 +10,8 @@ const SETTLE_MS = 1000;
 // (Beauty, Fragrances, Furniture, Laptops).
 const ARROWS_TO_LAPTOPS = 4;
 
+const PHONE_SEARCH_REQUEST = "/products/search?q=phone&limit=10&skip=0";
+
 const PHONE_TITLES = ["Search Phone Alpha", "Search Phone Beta", "Search Phone Gamma"];
 const MAC_TITLES = ["Search Mac Pro Book", "Search Mac Air Book"];
 const LAPTOP_TITLES = [
@@ -33,6 +35,12 @@ function categoryField(page: Page) {
 async function expectTitles(page: Page, titles: string[]) {
   for (const title of titles) {
     await expect(page.getByRole("link", { name: title })).toBeVisible();
+  }
+}
+
+async function expectNoTitles(page: Page, titles: string[]) {
+  for (const title of titles) {
+    await expect(page.getByRole("link", { name: title })).toHaveCount(0);
   }
 }
 
@@ -193,6 +201,87 @@ test.describe("catalog", () => {
       await expect(page).toHaveURL(/\/product\?q=mac$/);
       await expect(page.getByText("2 products found")).toBeVisible();
       await expectTitles(page, MAC_TITLES);
+    });
+  });
+
+  test("latest request wins", async ({ dummyJson, page }) => {
+    const phoneSearch = dummyJson.hold(PHONE_SEARCH_REQUEST);
+
+    await page.goto("/product");
+    await expect(page.getByText("194 products found")).toBeVisible();
+
+    await test.step("search phone, its response is held", async () => {
+      await searchField(page).fill("phone");
+      await phoneSearch.arrived;
+
+      await expect(page).toHaveURL(/\/product\?q=phone$/);
+    });
+
+    await test.step("choosing Laptops before the phone response shows the laptops", async () => {
+      await chooseCategory(page, "Laptops");
+
+      await expect(page.getByText("5 products found")).toBeVisible();
+      await expectTitles(page, LAPTOP_TITLES);
+    });
+
+    await test.step("the late phone response was aborted, laptops stay", async () => {
+      await phoneSearch.release();
+
+      expect(await phoneSearch.outcome).toBe("aborted");
+
+      await expect(page).toHaveURL(/\/product\?category=laptops$/);
+      await expect(page.getByText("5 products found")).toBeVisible();
+      await expectTitles(page, LAPTOP_TITLES);
+      await expectNoTitles(page, PHONE_TITLES);
+    });
+  });
+
+  test("leaving the catalog and coming back", async ({ dummyJson, page }) => {
+    const phoneSearch = dummyJson.hold(PHONE_SEARCH_REQUEST);
+
+    await page.goto("/product");
+    await expect(page.getByText("194 products found")).toBeVisible();
+
+    await test.step("search phone, its response is held, the full list stays", async () => {
+      await searchField(page).fill("phone");
+      await phoneSearch.arrived;
+
+      await expect(page).toHaveURL(/\/product\?q=phone$/);
+      await expect(page.getByText("194 products found")).toBeVisible();
+    });
+
+    await test.step("open a product while the phone response is held", async () => {
+      await page.getByRole("link", { name: "Essence Mascara Lash Princess" }).click();
+
+      await expect(page).toHaveURL(/\/products\/1$/);
+      await expect(page.getByRole("heading", { name: "Essence Mascara Lash Princess" }))
+        .toBeVisible();
+    });
+
+    await test.step("Back to products returns to the phone search", async () => {
+      await page.getByRole("link", { name: "Back to products" }).click();
+
+      await expect(page).toHaveURL(/\/product\?q=phone$/);
+      await expect(page.getByText("3 products found")).toBeVisible();
+      await expectTitles(page, PHONE_TITLES);
+    });
+
+    await test.step("choose Laptops", async () => {
+      await chooseCategory(page, "Laptops");
+
+      await expect(page.getByText("5 products found")).toBeVisible();
+      await expectTitles(page, LAPTOP_TITLES);
+    });
+
+    await test.step("the first phone response was aborted, only laptops stay", async () => {
+      await phoneSearch.release();
+
+      expect(await phoneSearch.outcome).toBe("aborted");
+
+      await expect(page).toHaveURL(/\/product\?category=laptops$/);
+      await expect(page.getByText("5 products found")).toBeVisible();
+      await expectTitles(page, LAPTOP_TITLES);
+      await expectNoTitles(page, PHONE_TITLES);
     });
   });
 });
