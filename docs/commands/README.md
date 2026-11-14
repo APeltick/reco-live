@@ -10,7 +10,7 @@
 | `npm run lint:styles:fix` | Runs Stylelint and applies automatic CSS fixes where available. Review the resulting diff. |
 | `npm run lint` | Runs ESLint followed by Stylelint. |
 | `npm run test` | Runs unit tests once with Vitest in the Node.js environment (`src/**/*.test.ts`). |
-| `npm run test:e2e` | Runs the Playwright e2e tests (`playwright test`) against `dist` served by `vite preview`, or against a running server set in `PLAYWRIGHT_BASE_URL`. The DummyJSON API is stubbed. Build first with `VITE_APP_API_URL=https://dummyjson.com npm run build`. Pass Playwright flags after `--`, for example `npm run test:e2e -- --grep @smoke`. See [E2E tests](../installation/README.md#e2e-tests). |
+| `npm run test:e2e` | Runs the Playwright e2e tests (`playwright test`) against `dist` served by `vite preview`, or against a running server. The base URL is `PLAYWRIGHT_BASE_URL`, then `BASE_URL`, then `http://127.0.0.1:<PORT>` (`4173` by default). The DummyJSON API is stubbed. Build first with `VITE_APP_API_URL=https://dummyjson.com npm run build`. Pass Playwright flags after `--`, for example `npm run test:e2e -- --grep @smoke`. See [E2E tests](../installation/README.md#e2e-tests). |
 | `npm run build` | Type-checks the project and creates a Vite production build in `dist/`. |
 | `npm run preview` | Serves the existing production build locally. |
 | `npm run audit` | Reports production dependency vulnerabilities with severity `high` or `critical` (`npm audit --omit=dev --audit-level=high`). Dev dependencies are not included; use plain `npm audit` for them and see [known issues](../issues/README.md). |
