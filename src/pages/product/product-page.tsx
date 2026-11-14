@@ -57,6 +57,9 @@ export function ProductPage() {
 
   const [searchText, setSearchText] = useState(urlSearchText);
   const [syncedUrlSearchText, setSyncedUrlSearchText] = useState(urlSearchText);
+  // The text the category choice cleared the field to, recorded synchronously in the handler;
+  // forgotten once the user edits the field.
+  const programmaticSearchTextReference = useRef<string | null>(null);
   const categories = useCategories();
 
   // The field follows the URL (link, Back/Forward, category choice).
@@ -76,11 +79,13 @@ export function ProductPage() {
   }, [needsReplace, page, query, setSearchParams]);
 
   // Apply the typed text after the pause, only when it differs from the URL's `q`.
-  // A programmatic clear after a category choice ("" equals the new `q`) is skipped.
+  // A programmatic clear after a category choice is skipped by the ref the handler sets,
+  // not by `urlSearchText`: the category URL is a router transition and may commit after
+  // the pause, while `urlSearchText` still holds the old `q`.
   useDebouncedValue(
     searchText.trim(),
     SEARCH_DEBOUNCE_MS,
-    (text) => text === urlSearchText,
+    (text) => text === urlSearchText || text === programmaticSearchTextReference.current,
     (text) => {
       setSearchParams(
         productsQueryToSearchParams(text === ""
@@ -114,6 +119,7 @@ export function ProductPage() {
   }
 
   function handleCategoryChange(slug: string) {
+    programmaticSearchTextReference.current = "";
     setSearchText("");
     setSearchParams(
       productsQueryToSearchParams(slug === ""
@@ -136,6 +142,7 @@ export function ProductPage() {
       <TextField
         label={T_T_DEV.searchLabel}
         onChange={(event) => {
+          programmaticSearchTextReference.current = null;
           setSearchText(event.target.value);
         }}
         type="search"
