@@ -32,7 +32,7 @@ The hook does not fix files or stage changes automatically. Correct the issue, r
 
 `pre-push` is the complete release-quality gate. Its jobs run in parallel and a failure blocks the push:
 
-- runs `npm ci --dry-run --ignore-scripts --legacy-peer-deps` to ensure `package-lock.json` reproduces the dependency tree while the documented accessibility peer-dependency issue remains open;
+- runs `npm ci --dry-run --ignore-scripts` to ensure `package-lock.json` reproduces the dependency tree;
 - runs `npm run check` for TypeScript, ESLint, Stylelint, Vitest unit tests, and a Vite production build;
 - runs `npm audit --omit=dev --audit-level=high` for high and critical vulnerabilities in production dependencies only. Dev dependencies are not checked by the hook; check them with plain `npm audit` and see the known issues in [`docs/issues/README.md`](../issues/README.md). This check requires access to the npm registry.
 
@@ -50,4 +50,4 @@ npm ls <package-that-reports-the-conflict>
 
 Then check whether an update of the package, the peer package, or a compatible alternative removes the conflict. Prefer that real fix. Only when the affected package is necessary, the incompatibility is understood, and no compatible update or replacement exists may `legacy-peer-deps` be used temporarily. Record the exact package, versions, reason, and upstream tracking link in project documentation. Revisit the exception whenever dependencies are upgraded.
 
-See [known dependency issues](../issues/README.md) for the current, explicitly scoped exception.
+See [known dependency issues](../issues/README.md) for open issues and their temporary resolutions.

@@ -12,9 +12,9 @@ Reco Live — React single-page application.
 
 ## Quick start
 
-⚠️ The current `--legacy-peer-deps` exception and its removal criteria are documented in [Known dependency issues](docs/issues/README.md). Add future unresolved issues there using the documented template. ⚠️
+Known dependency issues and their temporary resolutions are listed in [Known dependency issues](docs/issues/README.md). Add future unresolved issues there using the documented template.
 ```sh
-npm ci --legacy-peer-deps
+npm ci
 npm run dev
 ```
 

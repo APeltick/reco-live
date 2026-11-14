@@ -38,7 +38,7 @@ This project uses ESLint as the formatter and linter for JavaScript, TypeScript,
 | `import-x` | Import/export validity, cycles, duplicates, package boundaries, and TypeScript resolution. |
 | `perfectionist` | Deterministic import and export sorting. |
 | `react-x`, `react-dom`, `react-hooks`, `react-refresh` | React component, DOM, Hooks, React Compiler, and Vite Fast Refresh checks. |
-| `jsx-a11y` | Strict static JSX accessibility checks, with MUI Button/Link and polymorphic `component` support. |
+| `jsx-a11y-x` | Strict static JSX accessibility checks (`eslint-plugin-jsx-a11y-x`, the ESLint 9/10 fork of `eslint-plugin-jsx-a11y`), with MUI Button/Link and polymorphic `component` support. |
 | `unicorn` | Modern JavaScript correctness and best-practice checks. |
 | `regexp` | Regular-expression correctness and safety. |
 | `sonarjs` | Cognitive complexity, duplicated branches, code smells, and suspicious logic. |
@@ -59,7 +59,7 @@ The configuration adds explicit project rules on top of those presets:
 
 ## Accessibility
 
-The strict `jsx-a11y` preset checks static JSX for labels, ARIA attributes and roles, anchors, keyboard interaction, focusability, headings, media captions, and document language. It additionally rejects ambiguous link text and focusable elements hidden from assistive technology.
+The strict `jsx-a11y-x` preset checks static JSX for labels, ARIA attributes and roles, anchors, keyboard interaction, focusability, headings, media captions, and document language. It additionally rejects ambiguous link text and focusable elements hidden from assistive technology.
 
 Static linting cannot verify color contrast, focus order, focus traps, or actual screen-reader behavior.
 
