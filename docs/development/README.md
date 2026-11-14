@@ -29,7 +29,7 @@ npm explain <package-that-reports-the-conflict>
 npm ls <package-that-reports-the-conflict>
 ```
 
-Prefer upgrading the package, its peer dependency, or using a compatible alternative. Use a flag that bypasses peer-dependency validation only for an understood, documented exception after those options have been checked, and record it in known dependency issues.
+Prefer upgrading the package, its peer dependency, or using a compatible alternative. A flag that bypasses peer-dependency validation is an exception: its conditions and the record it needs are in [Peer-dependency conflicts](../issues/README.md#peer-dependency-conflicts).
 
 Known dependency issues and their temporary resolutions are listed in [the issues doc](../issues/README.md). Add new unresolved issues there using the documented template.
 

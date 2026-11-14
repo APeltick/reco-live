@@ -14,6 +14,7 @@ This project uses ESLint as the formatter and linter for JavaScript, TypeScript,
 | `tsconfig.app.json` | Browser application compiler settings. |
 | `tsconfig.node.json` | Node.js settings for `vite.config.ts`, `playwright.config.ts`, and the e2e tests in `tests/e2e/**`. |
 | `vite.config.ts` | Vite, React, MUI styling-engine, browser target, and local-server settings. |
+| `playwright.config.ts` | Playwright e2e settings: the test folder (`tests/e2e`), the browser project (Desktop Chrome), the base URL (`PLAYWRIGHT_BASE_URL`, then `BASE_URL`, then `127.0.0.1` on `PORT`, default `4173`), and the `vite preview` web server, which is always set with `reuseExistingServer`. |
 | `.npmrc` | Saves dependency versions exactly. |
 | `.node-version` | Declares the expected Node.js release. |
 

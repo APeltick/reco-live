@@ -40,7 +40,8 @@ A peer-dependency conflict is not a known issue by itself. Before accepting any 
 - Inspect the chain with `npm explain <package>` and `npm ls <package>`.
 - Prefer a real fix: a compatible version of the package or its peer dependency, or a compatible alternative.
 - Never set `legacy-peer-deps=true` in `.npmrc`: it suppresses peer-dependency validation for the whole project and can hide unrelated conflicts.
-- A flag for a single command is acceptable only for an understood, documented exception. Record it here as a known issue with the template above, including the exact package, versions, reason, upstream tracking link and the removal criteria.
+- A flag for a single command is acceptable only for an understood, documented exception where the affected package is necessary. Record it here as a known issue with the template above, including the exact package, versions, reason, upstream tracking link and the removal criteria.
+- Revisit every recorded exception whenever dependencies are upgraded; remove it as soon as its removal criteria are met.
 
 ## `minimatch` GHSA-g3hv-75wg-m249 — dev-only denial of service via globparts amplification
 
