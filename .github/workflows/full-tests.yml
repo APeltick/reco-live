@@ -94,6 +94,7 @@ jobs:
   full-tests-failure:
     # A red full on the integration branch (by schedule or manual) — an issue, everyone who watches the repository sees it
     # (the schedule email goes only to whoever last edited the cron). An open one exists — a comment, not a second one.
+    # The issue is in the project's tracker and place (DEC-0124: project.issue_tracker, project.issue_place); another tracker — no issue.
     needs: [e2e-full]
     if: always() && needs.e2e-full.result == 'failure' && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.ref_name == 'main'))
     runs-on: ubuntu-latest
@@ -105,8 +106,8 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           SHA: ${{ github.sha }}
         run: |
+          text="Red full e2e on main (${SHA:0:8}): $RUN_URL"
           gh label create full-tests-failure -R "$REPO" --color B60205 --description "Red full on the integration branch (DEC-0063)" 2>/dev/null || true
           n="$(gh issue list -R "$REPO" --label full-tests-failure --state open --json number --jq '.[0].number // empty')"
-          text="Red full e2e on main (${SHA:0:8}): $RUN_URL"
           if [ -n "$n" ]; then gh issue comment "$n" -R "$REPO" --body "$text"
           else gh issue create -R "$REPO" --title "full-tests: red run on main" --label full-tests-failure --body "$text — next as a breakage, through the board"; fi
