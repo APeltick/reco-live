@@ -2,10 +2,7 @@ import { expect, test } from "./fixtures/test.ts";
 
 const UNSTUBBED_PATH = "/products/9999";
 
-test("a held request without a fixture is a violation and is aborted on release", async ({
-  dummyJson,
-  page,
-}) => {
+test("an unmatched held request is a violation", async ({ dummyJson, page }) => {
   await page.goto("/product");
 
   const held = dummyJson.hold(UNSTUBBED_PATH);
