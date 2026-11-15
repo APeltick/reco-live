@@ -19,6 +19,8 @@
 | has_database | no | yes / no — `no` выключает шаги миграций в gate; в CI шаг миграций идёт, если у него есть команда (`commands`) |
 | ai_kit_min_version | 0.3.1-dev | минимальная версия AI kit для этого проекта |
 | timezone | Europe/Chisinau | часовой пояс команды: в нём время ночного full в CI (`schedule` → `nightly_full`) и границы суток в `ai-team stats`; задачи watchdog — по часам машины |
+| issue_place | — | where the project's issues are (DEC-0124): github-issues — `<owner>/<repo>` on the project's hosting (`—` — the project's own repository); another tracker — its project, board or team, for the agent (the adapter text). AI kit never opens or looks for issues in another place |
+| issue_labels | — | labels lead may put on a new issue (`ai-team issue create --label`), comma separated; `—` — none. Team chore and status labels are never put by it |
 
 ## commands
 
@@ -162,6 +164,7 @@
 | close_subtask | отметить пункт чеклиста |
 | comment | gh issue comment <N> |
 | flaky_issue | gh issue create --label flaky-test |
+| create_issue | ai-team issue create --name <name> --title <title> --body-file <file> --said OI-N (только по слову человека «open issue <name>», DEC-0124) |
 
 ## issue-status-map
 

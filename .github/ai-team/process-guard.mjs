@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Process guard of the AI kit — checks of the process rules in the project repository (spec/03 §2, spec/04 §5, spec/05 §6, spec/13).
 // It lives in the project's git: works in CI and in gate without the AI kit installed. Node ≥ 22 only, no dependencies; decisions
-// (ADR and ATD) are checked by the logic of decisions.mjs next to it — a copy of utils/decisions.mjs of the AI kit, also in the project's git.
+// (ADR and ATD) are checked by the logic of decisions.mjs next to it — a copy of modules/work-cycle/utils/decisions.mjs of the AI kit, also in the project's git.
 //
 //   node .github/ai-team/process-guard.mjs [--base <ref>] [--head <ref>] [--pr-body <file>] [--all]
 //   node .github/ai-team/process-guard.mjs adr-index [--write | --check]       decision indexes: project ADR (with the adr rule) and ATD
@@ -63,7 +63,7 @@ const read = (p) => (HEAD === "HEAD" ? (existsSync(join(ROOT, p)) ? readFileSync
 // The working copy — with files not yet added to git (a check before the commit), the head of a PR — its tree.
 const lsFiles = (...paths) => (HEAD === "HEAD" ? git("ls-files", "--cached", "--others", "--exclude-standard", "--", ...paths) : git("ls-tree", "-r", "--name-only", HEAD, "--", ...paths)).split("\n").filter(Boolean);
 
-// phrases:begin — a copy of DEC-0105 §2.7 from scripts/lib/phrases.mjs of the AI kit (the process guard lives in the project's git
+// phrases:begin — a copy of DEC-0105 §2.7 from modules/communication/lib/phrases.mjs of the AI kit (the process guard lives in the project's git
 // and does not import AI kit modules). en — the form the PR template writes and the messages name; ru — the old form, still read
 // (compat): PR descriptions, test labels and overlays written by an older AI kit stay green. tests/process-guard.test.mjs of the
 // AI kit checks that the copy is the same.
@@ -132,9 +132,9 @@ const fail = (rule, text) => problems.push(`[${rule}] ${text}`);
 
 // ---------- decisions: project ADR and ATD (DEC-0049, DEC-0091) ----------
 // One model: a file «as decided now» (<ID>-<slug>.md) and its history history/<the same file>, the number is forever, statuses
-// «active» / «revoked». The index and the checks — decisions.mjs next to it (a copy of utils/decisions.mjs of the AI kit).
+// «active» / «revoked». The index and the checks — decisions.mjs next to it (a copy of modules/work-cycle/utils/decisions.mjs of the AI kit).
 // ADRs that the project kept by the standard (NNNN-<slug>.md, Accepted / Superseded) stay as they are: the index understands them.
-// decision-paths:begin — a copy of scripts/lib/decision-paths.mjs of the AI kit (the process guard in the project's git does not
+// decision-paths:begin — a copy of modules/kernel/lib/decision-paths.mjs of the AI kit (the process guard in the project's git does not
 // import AI kit modules): the ADR folder from the project overlay and «file — decision». tests/process-guard.test.mjs of the AI kit checks they are the same.
 const ATD_DIR = "ai-team-docs/atd";
 const LEGACY_ATD_DIR = "ai-team-docs/adr"; // before DEC-0091 the «ADRs about the work of the AI team» lay here
@@ -183,7 +183,7 @@ const isAdrDoc = (f) => isDecisionFile(f, [...ADR_DIRS, ATD_DIR, LEGACY_ATD_DIR]
 // count the probe as an edge core → option (decisions — an option, the process guard — core; no file — not a build error, but the adr rule).
 let D = null;
 try { D = await import(new URL("./decisions.mjs", import.meta.url).href); } catch { /* the adr rule will say */ }
-const NO_DECISIONS = "no .github/ai-team/decisions.mjs next to the process guard — decisions cannot be checked: update the AI kit (`node <AI kit>/installer/apply.mjs update`) or copy utils/decisions.mjs of the AI kit";
+const NO_DECISIONS = "no .github/ai-team/decisions.mjs next to the process guard — decisions cannot be checked: update the AI kit (`node <AI kit>/modules/installer/installer/apply.mjs update`) or copy modules/work-cycle/utils/decisions.mjs of the AI kit";
 // Read a folder: the working copy or the tree of a ref (the PR head, the merge-base).
 const readerOf = (dir, ref = HEAD) => (ref === "HEAD" ? D.fsReader(join(ROOT, dir)) : D.gitReader(join(ROOT, dir), ref));
 const INDEX_CMD = "ai-team adr-index (or node .github/ai-team/process-guard.mjs adr-index --write)";
