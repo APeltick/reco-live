@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 // Decisions of three kinds (DEC-0091): DEC — the AI kit flow, ADR — the project's decisions, ATD — the work of the AI team in the project.
 // A decision is a file "as decided now" (<ID>-<slug>.md), next to it the history history/<the same file>: newest entries first.
-// One script and one set of templates (templates/decisions/) for the three kinds: the kind changes the folder and the prefix.
+// One script and one set of templates (modules/decisions/templates/decisions/) for the three kinds: the kind changes the folder and the prefix.
 // Node >= 22 only, no dependencies and no AI kit libraries — the file can be copied into a project as is.
 //
-//   node utils/decisions.mjs index <folder> --prefix DEC|ADR|ATD [--check]
-//   node utils/decisions.mjs check <folder> --prefix DEC|ADR|ATD [--base <ref>] [--head <ref>] [--link <KIND>=<folder>]…
+//   node modules/work-cycle/utils/decisions.mjs index <folder> --prefix DEC|ADR|ATD [--check]
+//   node modules/work-cycle/utils/decisions.mjs check <folder> --prefix DEC|ADR|ATD [--base <ref>] [--head <ref>] [--link <KIND>=<folder>]…
 // The copy in a project is .github/ai-team/decisions.mjs (the process guard calls it in the project's CI, without the AI kit); copy = this file.
 //
 // The frame of a decision file is written in English (DEC-0105 §2.6: Status / Accepted / Changed / Template / History, the sections
@@ -35,7 +35,7 @@ export const KINDS = {
   ADR: { title: "Project decisions (ADR)" },
   ATD: { title: "Decisions about the work of the AI team (ATD)" },
 };
-// The sections of the templates — in the template order (templates/decisions/full.md, minimal.md).
+// The sections of the templates — in the template order (modules/decisions/templates/decisions/full.md, minimal.md).
 export const TEMPLATES = {
   full: ["Why", "Options", "Decision", "Consequences", "Related"],
   minimal: ["Why", "Decision", "Consequences"],
@@ -348,7 +348,7 @@ export function loadFolder(reader, prefix, err = () => {}) {
   for (const name of reader.list("")) {
     const info = nameInfo(name, prefix);
     if (!info) continue;
-    if (info.oldName) { err(name, `the name must be ${prefix}-NNNN-<slug>.md, but this is the former name (before DEC-0091): rename it to ${prefix}-${String(info.num).padStart(4, "0")}-<slug>.md and move it to the template with a history (templates/decisions/); the old form stays only for the project's ADR`); continue; }
+    if (info.oldName) { err(name, `the name must be ${prefix}-NNNN-<slug>.md, but this is the former name (before DEC-0091): rename it to ${prefix}-${String(info.num).padStart(4, "0")}-<slug>.md and move it to the template with a history (modules/decisions/templates/decisions/); the old form stays only for the project's ADR`); continue; }
     if (info.bad) { err(name, `the file name must be ${prefix}-NNNN-<slug>.md: four digits (from 0001) and a slug in Latin lower case with hyphens`); continue; }
     const d = parseDecision(reader.read(name), name, prefix, info);
     d.historyRaw = d.format === "legacy" ? null : reader.read(`history/${name}`);
@@ -401,7 +401,7 @@ function readmeSkeleton(prefix) {
   return [
     `# ${KINDS[prefix].title}`,
     "",
-    `The index is built by the AI kit script \`utils/decisions.mjs index\` — do not edit it by hand. A decision is a file \`${prefix}-NNNN-<slug>.md\` ("as decided now"), its history is \`history/<the same file>\`, newest entries first. A new decision takes the next number; to change a decision, edit the same file and add an entry on top of its history.`,
+    `The index is built by the AI kit script \`modules/work-cycle/utils/decisions.mjs index\` — do not edit it by hand. A decision is a file \`${prefix}-NNNN-<slug>.md\` ("as decided now"), its history is \`history/<the same file>\`, newest entries first. A new decision takes the next number; to change a decision, edit the same file and add an entry on top of its history.`,
     "",
     BEGIN,
     END,
@@ -433,7 +433,7 @@ function checkDecision(d, err) {
   const f = d.file;
   if (d.format === "legacy") return; // an old ADR: only the number, the removal and the links are checked
   if (d.format === "none") {
-    err(f, `no header: "- **Status:**", "- **Accepted:** … · **Changed:** …", "- **Template:**", "- **History:**" (the templates are in templates/decisions/)`);
+    err(f, `no header: "- **Status:**", "- **Accepted:** … · **Changed:** …", "- **Template:**", "- **History:**" (the templates are in modules/decisions/templates/decisions/)`);
     return;
   }
   if (d.nameStyle !== "new") err(f, `the file name must be ${d.id}-<slug>.md (a slug in Latin lower case with hyphens)`);
@@ -471,7 +471,7 @@ function checkDecision(d, err) {
 
   // the history
   const hf = `history/${f}`;
-  if (d.historyRaw === null) { err(f, `no history file ${hf} (the template is templates/decisions/history.md)`); return; }
+  if (d.historyRaw === null) { err(f, `no history file ${hf} (the template is modules/decisions/templates/decisions/history.md)`); return; }
   const h = parseHistory(d.historyRaw);
   if (!h.titleId) err(hf, `no title "# ${d.id} · <question> — history"`);
   else if (h.titleId !== d.id) err(hf, `the title has ${h.titleId}, but the decision is ${d.id}`);
@@ -557,7 +557,7 @@ function checkBase(cur, base, ref, err) {
     // HTML comments are not the text of a decision: editing them needs no history entry.
     const changed = same(stripComments(norm(b.raw))) !== same(stripComments(norm(c.raw)));
     if (c.format === "legacy") {
-      if (changed) err(c.file, `the old ADR ${c.id} was changed (against ${ref}) — the edit goes by the new rule: move the file to the template (header, sections) and start a history (templates/decisions/)`);
+      if (changed) err(c.file, `the old ADR ${c.id} was changed (against ${ref}) — the edit goes by the new rule: move the file to the template (header, sections) and start a history (modules/decisions/templates/decisions/)`);
       continue;
     }
     if (c.format !== "new" || c.historyRaw === null) continue; // the error is already recorded
@@ -576,7 +576,7 @@ function checkBase(cur, base, ref, err) {
   }
   // The old form (Accepted / Superseded, no header and no history) stays only for the ADRs that were already in the base (DEC-0091, rule 7).
   for (const c of cur.decisions) {
-    if (c.format === "legacy" && !matched.has(c)) err(c.file, `a new ADR in the old form (status "${c.statusRaw}", no header and no history) — new decisions only by the template: header, sections, history (templates/decisions/, in a project — 0000-template.md); the old form stays only for the ADRs that were already in ${ref}`);
+    if (c.format === "legacy" && !matched.has(c)) err(c.file, `a new ADR in the old form (status "${c.statusRaw}", no header and no history) — new decisions only by the template: header, sections, history (modules/decisions/templates/decisions/, in a project — 0000-template.md); the old form stays only for the ADRs that were already in ${ref}`);
   }
 }
 
@@ -606,7 +606,7 @@ export function checkFolder({ reader, prefix, baseReader = null, baseRef = "", l
 
 // ---------- CLI ----------
 
-// The script path as it is called from here: utils/decisions.mjs in the AI kit, .github/ai-team/decisions.mjs in a project (the same copy).
+// The script path as it is called from here: modules/work-cycle/utils/decisions.mjs in the AI kit, .github/ai-team/decisions.mjs in a project (the same copy).
 const SELF = relative(process.cwd(), SCRIPT) || SCRIPT;
 const USAGE = `Decisions DEC, ADR, ATD (DEC-0091): the index and the checks.
 

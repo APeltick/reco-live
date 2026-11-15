@@ -1,21 +1,24 @@
 #!/usr/bin/env node
 // AI kit: from Playwright reports (JSON) — a CI step without AI (spec/05 §6, §7):
-//   a flaky test → an issue `flaky-test` in GitHub Issues (one issue per test; a comment for each occurrence);
+//   a flaky test → an issue `flaky-test` in GitHub Issues of the project's issue place (one issue per test; a comment for each occurrence);
 //   a test in quarantine (`@quarantine #<issue> until …`) → the run result as a comment in its issue;
 //   in GitHub Actions — the annotation «ai-kit e2e tests» with the number of executed tests: watch takes the number of full tests from it (M5).
 //   node .github/ai-team/flaky-report.mjs <report.json>…
 // Test paths are from the repository root (as in the gate), so that the issues of one test are not doubled.
 // Duplicates are cut by the key «test + run». The tracker is not GitHub Issues or there is no access — «not recorded: no access».
+// The tracker and the place are the project's (DEC-0124): project overlay → project.issue_tracker, project.issue_place (`<owner>/<repo>`; empty —
+// this repository). Every issue and label call goes there (-R); a place that is not <owner>/<repo> — not recorded, never this repository instead.
 import { execFileSync, spawnSync } from "node:child_process";
 import { existsSync, readFileSync, realpathSync } from "node:fs";
 import { relative, resolve } from "node:path";
 
 // The hosting is one place: every call to the tracker and the hosting below goes through host. Another hosting changes only this object
 // (the script runs in the project's CI without AI kit). Here — GitHub, through gh.
-function hostGithub() {
-  const gh = (...a) => execFileSync("gh", a, { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+function hostGithub(place = "") {
+  const R = place ? ["-R", place] : [];
+  const gh = (...a) => execFileSync("gh", [...a, ...R], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
   return {
-    labelCreate: (name, color, description) => spawnSync("gh", ["label", "create", name, "--color", color, "--description", description], { stdio: "ignore" }),
+    labelCreate: (name, color, description) => spawnSync("gh", ["label", "create", name, "--color", color, "--description", description, ...R], { stdio: "ignore" }),
     issueComments: (issue) => JSON.parse(gh("issue", "view", String(issue), "--json", "comments")).comments ?? [],
     issueComment: (issue, body) => gh("issue", "comment", String(issue), "--body", body),
     issueFind: (label, search) => JSON.parse(gh("issue", "list", "--label", label, "--state", "all", "--search", search, "--json", "number,title,state", "--limit", "5")),
@@ -57,15 +60,21 @@ if (parsed && process.env.GITHUB_ACTIONS) console.log(`::notice title=ai-kit e2e
 if (!flaky.length && !quarantined.length) { console.log("flaky: none; quarantine: did not run"); process.exit(0); }
 
 const overlay = existsSync("ai-team-docs/config/project-overlay.md") ? readFileSync("ai-team-docs/config/project-overlay.md", "utf8") : "";
-const tracker = (/^\|\s*issue_tracker\s*\|\s*([^|]+?)\s*\|/m.exec(overlay)?.[1] ?? "github-issues").replace(/^<(.*)>$/, "$1");
-if (tracker !== "github-issues" || !process.env.GH_TOKEN) {
-  console.log(`flaky and quarantine not recorded: no access (tracker ${tracker}${process.env.GH_TOKEN ? "" : ", no GH_TOKEN"}). Flaky: ${flaky.length}, quarantine: ${quarantined.length}`);
+// A value of the project section: backticks dropped, a template stub <…> — its text for the tracker, "" for the place; a dash — "".
+const value = (key) => (new RegExp(`^\\|\\s*${key}\\s*\\|\\s*([^|]*?)\\s*\\|`, "m").exec(overlay)?.[1] ?? "").replace(/`/g, "").trim();
+const tracker = (value("issue_tracker") || "github-issues").replace(/^<(.*)>$/, "$1");
+const placeRaw = value("issue_place");
+const place = /^<.*>$|^[—–-]$/.test(placeRaw) ? "" : placeRaw;
+const badPlace = place && !/^[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\/[A-Za-z0-9._-]+$/.test(place);
+if (tracker !== "github-issues" || badPlace || !process.env.GH_TOKEN) {
+  const why = tracker !== "github-issues" ? `tracker ${tracker}` : badPlace ? `project.issue_place «${place}» is not <owner>/<repo> — fix it in the project overlay` : `tracker ${tracker}`;
+  console.log(`flaky and quarantine not recorded: no access (${why}${process.env.GH_TOKEN ? "" : ", no GH_TOKEN"}). Flaky: ${flaky.length}, quarantine: ${quarantined.length}`);
   for (const t of flaky) console.log(`- ${t.file}:${t.line} › ${t.title} (${t.outcome})`);
   for (const t of quarantined) console.log(`- quarantine #${t.issue}: ${t.file}:${t.line} › ${t.title} (${t.outcome})`);
   process.exit(0);
 }
 
-const host = hostGithub();
+const host = hostGithub(place);
 const run = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
 const pr = process.env.GITHUB_EVENT_NAME === "pull_request" ? `#${(process.env.GITHUB_REF ?? "").split("/")[2]}` : process.env.GITHUB_EVENT_NAME === "schedule" ? "nightly run" : process.env.GITHUB_EVENT_NAME;
 const keyOf = (t) => `${process.env.GITHUB_RUN_ID}:${process.env.GITHUB_RUN_ATTEMPT ?? 1}:${t.file}:${t.line}:${t.project ?? ""}`;
