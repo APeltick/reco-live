@@ -1,5 +1,5 @@
 <!--
-The project's ADR template (DEC-0091 of the AI kit; the same as templates/decisions/full.md and minimal.md of the AI kit).
+The project's ADR template (DEC-0091 of the AI kit; the same as modules/decisions/templates/decisions/full.md and minimal.md of the AI kit).
 The file is ADR-NNNN-<slug>.md in this folder. NNNN is the next free number: "ai-team adr-next" (it takes into account the open PRs
 of colleagues). <slug> — short, in English, with hyphens.
 
