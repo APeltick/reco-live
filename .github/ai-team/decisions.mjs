@@ -4,8 +4,8 @@
 // One script and one set of templates (modules/decisions/templates/decisions/) for the three kinds: the kind changes the folder and the prefix.
 // Node >= 22 only, no dependencies and no AI kit libraries — the file can be copied into a project as is.
 //
-//   node modules/work-cycle/utils/decisions.mjs index <folder> --prefix DEC|ADR|ATD [--check]
-//   node modules/work-cycle/utils/decisions.mjs check <folder> --prefix DEC|ADR|ATD [--base <ref>] [--head <ref>] [--link <KIND>=<folder>]…
+//   node modules/kernel/utils/decisions.mjs index <folder> --prefix DEC|ADR|ATD [--check]
+//   node modules/kernel/utils/decisions.mjs check <folder> --prefix DEC|ADR|ATD [--base <ref>] [--head <ref>] [--link <KIND>=<folder>]…
 // The copy in a project is .github/ai-team/decisions.mjs (the process guard calls it in the project's CI, without the AI kit); copy = this file.
 //
 // The frame of a decision file is written in English (DEC-0105 §2.6: Status / Accepted / Changed / Template / History, the sections
@@ -401,7 +401,7 @@ function readmeSkeleton(prefix) {
   return [
     `# ${KINDS[prefix].title}`,
     "",
-    `The index is built by the AI kit script \`modules/work-cycle/utils/decisions.mjs index\` — do not edit it by hand. A decision is a file \`${prefix}-NNNN-<slug>.md\` ("as decided now"), its history is \`history/<the same file>\`, newest entries first. A new decision takes the next number; to change a decision, edit the same file and add an entry on top of its history.`,
+    `The index is built by the AI kit script \`modules/kernel/utils/decisions.mjs index\` — do not edit it by hand. A decision is a file \`${prefix}-NNNN-<slug>.md\` ("as decided now"), its history is \`history/<the same file>\`, newest entries first. A new decision takes the next number; to change a decision, edit the same file and add an entry on top of its history.`,
     "",
     BEGIN,
     END,
@@ -606,7 +606,7 @@ export function checkFolder({ reader, prefix, baseReader = null, baseRef = "", l
 
 // ---------- CLI ----------
 
-// The script path as it is called from here: modules/work-cycle/utils/decisions.mjs in the AI kit, .github/ai-team/decisions.mjs in a project (the same copy).
+// The script path as it is called from here: modules/kernel/utils/decisions.mjs in the AI kit, .github/ai-team/decisions.mjs in a project (the same copy).
 const SELF = relative(process.cwd(), SCRIPT) || SCRIPT;
 const USAGE = `Decisions DEC, ADR, ATD (DEC-0091): the index and the checks.
 
